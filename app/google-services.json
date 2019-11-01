@@ -1,0 +1,91 @@
+{
+  "project_info": {
+    "project_number": "143475226828",
+    "firebase_url": "https://virtual-time-clock-d7449.firebaseio.com",
+    "project_id": "virtual-time-clock-d7449",
+    "storage_bucket": "virtual-time-clock-d7449.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:143475226828:android:7e5e2e839087faa2d46a69",
+        "android_client_info": {
+          "package_name": "com.fr.virtualtimeclock_client"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "143475226828-njr4hi54ec3nv1pf6bdturoaogf6cuc5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHgWapIk6DCJdK5HLicDmyox6cDypI_l0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "143475226828-njr4hi54ec3nv1pf6bdturoaogf6cuc5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "143475226828-7fn83jn1km2vbilsd27b2qmkacr4467t.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.fr.virtualtimeclock-gerant"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:143475226828:android:c99a0d808989c39ed46a69",
+        "android_client_info": {
+          "package_name": "com.fr.virtualtimeclock_gerant"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "143475226828-q058ks0oia63shgk2e2rcd33elvachfq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.fr.virtualtimeclock_gerant",
+            "certificate_hash": "3159729ffd71529fc4e7219fe381b85e544cda3a"
+          }
+        },
+        {
+          "client_id": "143475226828-njr4hi54ec3nv1pf6bdturoaogf6cuc5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHgWapIk6DCJdK5HLicDmyox6cDypI_l0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "143475226828-njr4hi54ec3nv1pf6bdturoaogf6cuc5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "143475226828-7fn83jn1km2vbilsd27b2qmkacr4467t.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.fr.virtualtimeclock-gerant"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

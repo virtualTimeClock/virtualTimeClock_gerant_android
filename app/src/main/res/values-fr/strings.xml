@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="loading">Chargement...</string>
+    <string name="auth_failed">Echec de l\'authentification</string>
+    <string name="create_account">Création de compte</string>
+    <string name="emailpassword_status_fmt">Email Utilisateur : %s</string>
+    <string name="emailpassword_title_text">Email et Mdp</string>
+    <string name="firebase_status_fmt">Firebase Utilisateur: %s</string>
+    <string name="desc_firebase_lockup">Firebase Logo et nom</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Mdp</string>
+    <string name="sign_in">Connexion</string>
+    <string name="sign_out">Déconnexion</string>
+    <string name="verify_email">Email Vérifié</string>
+    <string name="signed_out">Session</string>
+    <string name="date_start">Date de début</string>
+    <string name="latitude">Latitude</string>
+    <string name="location">Lieu</string>
+    <string name="longitude">Longitude</string>
+    <string name="titre">Titre</string>
+    <string name="date_stop">Date de fin</string>
+    <string name="radius">Rayon</string>
+    <string name="creation_mission_send">Mission Sauvegardé</string>
+    <string name="creation_mission_fail">Erreur lors de l\'envoi</string>
+    <string name="firebase_statue_fmt_null">"Firebase Utilisateur: "</string>
+</resources>
