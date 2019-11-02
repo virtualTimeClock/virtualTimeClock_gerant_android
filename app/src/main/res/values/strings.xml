@@ -23,4 +23,7 @@
     <string name="creation_mission_send">Mission Saved</string>
     <string name="creation_mission_fail">Error Send</string>
     <string name="firebase_statue_fmt_null">FIrebase User:</string>
+    <string name="isLeader" translatable="false">%s</string>
+    <string name="its_not_a_leader">You are not a leader !</string>
+    <string name="its_a_leader_sucess_connection">Sucess connection !</string>
 </resources>

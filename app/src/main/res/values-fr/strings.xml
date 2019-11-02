@@ -8,7 +8,7 @@
     <string name="firebase_status_fmt">Firebase Utilisateur: %s</string>
     <string name="desc_firebase_lockup">Firebase Logo et nom</string>
     <string name="hint_email">Email</string>
-    <string name="hint_password">Mdp</string>
+    <string name="hint_password">Mot de passe</string>
     <string name="sign_in">Connexion</string>
     <string name="sign_out">Déconnexion</string>
     <string name="verify_email">Email Vérifié</string>
@@ -23,4 +23,6 @@
     <string name="creation_mission_send">Mission Sauvegardé</string>
     <string name="creation_mission_fail">Erreur lors de l\'envoi</string>
     <string name="firebase_statue_fmt_null">"Firebase Utilisateur: "</string>
+    <string name="its_not_a_leader">Vous n\'êtes pas un gérant !</string>
+    <string name="its_a_leader_sucess_connection">Connexion établie !</string>
 </resources>
