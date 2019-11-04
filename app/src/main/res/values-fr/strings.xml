@@ -25,4 +25,12 @@
     <string name="firebase_statue_fmt_null">"Firebase Utilisateur: "</string>
     <string name="its_not_a_leader">Vous n\'êtes pas un gérant !</string>
     <string name="its_a_leader_sucess_connection">Connexion établie !</string>
+    <string name="msg_sign_out">Êtes-vous sûr de vouloir vous déconnecter ?</string>
+    <string name="save">Sauvegarder</string>
+    <string name="emptyField">Veuillez insérer toutes les informations avant l\'envoi</string>
+    <string name="addMission">Ajouter une mission</string>
+    <string name="calend">Calendrier</string>
+    <string name="dateFormatStart">"Début : "</string>
+    <string name="dateFormatStop">"Fin : "</string>
+    <string name="dateFormat">Mois/Jour/Année</string>
 </resources>

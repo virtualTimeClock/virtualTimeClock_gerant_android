@@ -26,4 +26,12 @@
     <string name="isLeader" translatable="false">%s</string>
     <string name="its_not_a_leader">You are not a leader !</string>
     <string name="its_a_leader_sucess_connection">Sucess connection !</string>
+    <string name="msg_sign_out">Are you sure you want to log out?</string>
+    <string name="save">Save</string>
+    <string name="emptyField">Please insert all information before sending</string>
+    <string name="addMission">Add Mission</string>
+    <string name="calend">Calendar</string>
+    <string name="dateFormatStart">"Start : "</string>
+    <string name="dateFormatStop">"End : "</string>
+    <string name="dateFormat">Month/Day/Year</string>
 </resources>

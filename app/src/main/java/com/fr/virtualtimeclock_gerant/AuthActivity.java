@@ -47,14 +47,6 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
     }
-    /*@Override
-    public void onStart() {
-        super.onStart();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser !=null){
-            getItems(currentUser.getUid());
-        }
-    }*/
 
     //Fonction exécuter lors de la connexion de l'utilisateur
     private void signIn(String email, String password) {
@@ -87,11 +79,6 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
                     hideProgressDialog();
                 }
             });
-    }
-
-    //Fonction éxécuter pour déconnecter
-    private void signOut() {
-        mAuth.signOut();
     }
 
     //Fonction qui récupère l'information qui précise si l'utilisateur est un Employeur ou non
