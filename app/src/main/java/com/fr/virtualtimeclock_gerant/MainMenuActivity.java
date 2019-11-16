@@ -1,24 +1,36 @@
 package com.fr.virtualtimeclock_gerant;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import android.Manifest;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.darwindeveloper.horizontalscrollmenulibrary.custom_views.HorizontalScrollMenuView;
 import com.darwindeveloper.horizontalscrollmenulibrary.extras.MenuItem;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -26,11 +38,30 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.yalantis.ucrop.UCrop;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 
 public class MainMenuActivity extends AppCompatActivity implements View.OnClickListener {
 
+
+    private static final int CAMERA_REQUEST_CODE = 1;
+    private static final int STORAGE_REQUEST_CODE = 2;
+    private static final String TAG = "imageCreation";
+    private final String SAMPLE_CROPPED_IMG_NAME = "SampleCropImg";
+
     private TextView userEmail;
-    private Button userLogout;
+
+    private Button buttonCapture;
+    private ImageView companyPicture;
 
     private HorizontalScrollMenuView menu;
     private FloatingActionButton buttonAdNote;
@@ -38,10 +69,19 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseUser currentUser =  mAuth.getCurrentUser();
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private StorageReference storageReference;
+    private FirebaseStorage storage;
 
     private CollectionReference notebookRef = db.collection("missions");
 
     private MissionAdapter adapter;
+
+    private File photoFile;
+    private Uri filepath;
+
+    private String imgURL = "";
+
+    private Button test;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,78 +90,31 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
 
         menu = findViewById(R.id.menu);
         userEmail = findViewById(R.id.email);
-        userLogout = findViewById(R.id.btnSignOut);
         buttonAdNote = findViewById(R.id.button_add_mission);
+        buttonCapture = findViewById(R.id.upload);
+        companyPicture = findViewById(R.id.imageView);
+        test = findViewById(R.id.testBtn);
 
-        userLogout.setOnClickListener(this);
+        // Vérification des permissions pour la caméra et le stockage
+        if(Build.VERSION.SDK_INT >= 23) requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_REQUEST_CODE);
+
+        storage  = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
+
         buttonAdNote.setOnClickListener(this);
+        buttonCapture.setOnClickListener(this);
+        test.setOnClickListener(this);
 
         userEmail.setText(currentUser.getEmail());
 
-        initMenu();
-
+        initMenuBar();
         setUpRecyclerView();
-
+        loadProfilePicture();
     }
 
-
-
-    private void setUpRecyclerView() {
-        Query query = notebookRef.orderBy("debut", Query.Direction.ASCENDING);
-
-        FirestoreRecyclerOptions<Mission> options = new FirestoreRecyclerOptions.Builder<Mission>()
-                .setQuery(query, Mission.class)
-                .build();
-
-        adapter = new MissionAdapter(options);
-
-        RecyclerView recyclerView = findViewById(R.id.recycler_view);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(adapter);
-
-        // Pour la suppression des mission on choisi de ne pas faire de drag and drop
-        //   et de faire supprimer la mission par la droite ou la gauche lors du glissement
-        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-            //Pour du drag and drop (inutiliser dans notre cas)
-            @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                return false;
-            }
-            //Pour des mouvements de glissements
-            @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                adapter.deleteItem(viewHolder.getAdapterPosition());
-            }
-        }).attachToRecyclerView(recyclerView);
-
-        //Détecte le clic sur la mission
-        adapter.setOnClickListener(new MissionAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
-                Mission mission = documentSnapshot.toObject(Mission.class);
-                String id = documentSnapshot.getId();
-                String path = documentSnapshot.getReference().getPath();
-                Toast.makeText(MainMenuActivity.this, "Position: " + position+ " ID: "+id,
-                        Toast.LENGTH_SHORT).show();
-                //startActivity();
-            }
-        });
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        adapter.startListening();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        adapter.stopListening();
-    }
-
-    private void initMenu() {
+    // Création du menu avec toutes les onglets contenant les images et lors du clic sur un onglet
+    //     il affiche le layout qui lui correspond en masquant les autres
+    private void initMenuBar() {
         menu.addItem("Profile", R.drawable.ic_profile);
         menu.addItem("Employee", R.drawable.ic_employee);
         menu.addItem("Mission",R.drawable.ic_mission_selected,true);
@@ -183,15 +176,241 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
             }
         });
     }
+
+    // Fonction qui identifie sur quel bouton l'utilisateur a cliqué
+    @Override
+    public void onClick(View v) {
+        int i = v.getId();
+        if(i == R.id.button_add_mission){
+            startActivity(new Intent(MainMenuActivity.this, NewMissionActivity.class));
+        }else if(i == R.id.upload){
+            dispatchPictureTakerAction();
+        }else if(i ==R.id.testBtn){
+            startActivity(new Intent(MainMenuActivity.this, ShootAndCropActivity.class));
+        }
+    }
+
+    // Quand on clic sur le bouton retour du téléphone on ouvre la boite de dialog pour la déconnnexion
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+            LogoutAlertDialog();
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    // ---------------------------------------------- Menu Profile : ------------------------------------ :
+
+    // Récupère la photo de profile sur la base de données
+    // - uri : url de téléchargement de la photo sur la base de données
+    private void loadProfilePicture(){
+        StorageReference profilePic = storageReference.child("Photos/profilePic").getParent().child("profilePic");
+        profilePic.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                imgURL = String.valueOf(uri);
+                Glide.with(getApplicationContext())
+                        .load(imgURL)
+                        .into(companyPicture);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Toast.makeText(MainMenuActivity.this, getString(R.string.load_img_failed), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    //Ouverture de l'appareil photo
+    private void dispatchPictureTakerAction() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if(takePictureIntent.resolveActivity(getPackageManager()) != null){ // S'assurer qu'il y a une application caméra pour lancer l'Intent
+            //Création du fichier ou la photo va être save
+            photoFile = createPhotoFile();
+            if(photoFile != null){
+                filepath = FileProvider.getUriForFile(MainMenuActivity.this,"com.fr.virtualtimeclock_gerant.fileprovider",photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, filepath);
+                startActivityForResult(takePictureIntent, CAMERA_REQUEST_CODE);
+            }
+        }
+    }
+
+    // Création de la photos au format jpg avec comme nom la date ou la photo a été prise
+    // Sauvegarde des photos dans le répertoire cache de l'application
+    private File createPhotoFile(){
+        String name = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_"+ name +"_VTC_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = null;
+        try {
+            image = File.createTempFile(imageFileName, ".jpg", storageDir);
+        } catch (IOException e) {
+            Log.d(TAG,"ImageFile : "+e.toString());
+        }
+        return image;
+    }
+
+    // Envoi de l'image sur la base de données avec un affichage d'une barre de chargement
+    private void uploadImage(Uri filepathCrop){
+        if(filepathCrop != null){
+            final ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setTitle("Uploading...");
+            progressDialog.show();
+
+            StorageReference reference = storageReference.child("Photos/"+"profilePic");
+            reference.putFile(filepathCrop)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            progressDialog.dismiss();
+                            Toast.makeText(MainMenuActivity.this, "Upload Successful!", Toast.LENGTH_SHORT).show();
+                            //loadProfilePicture();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    progressDialog.dismiss();
+                    Toast.makeText(MainMenuActivity.this, "Upload Failed!", Toast.LENGTH_SHORT).show();
+                }
+            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+                    double progress = (100.0*taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                    progressDialog.setMessage("Uploaded " + (int) progress + "%");
+                }
+            });
+        }
+    }
+
+    // ---------------------------------------------- Menu Employées : ---------------------------------- :
+
+    //TODO : LISTES DES EMPLOYEES + CREATION ET SUPPRESSION COMPTE
+
+    // ---------------------------------------------- Menu Missions : ----------------------------------- :
+
+    // Affichage des missions ordonnées par date de début
+    // Suppression des missions avec des swipes latéraux
+    // Ouverture des missions
+    private void setUpRecyclerView() {
+        Query query = notebookRef.orderBy("debut", Query.Direction.ASCENDING);
+
+        FirestoreRecyclerOptions<Mission> options = new FirestoreRecyclerOptions.Builder<Mission>()
+                .setQuery(query, Mission.class)
+                .build();
+
+        adapter = new MissionAdapter(options);
+
+        RecyclerView recyclerView = findViewById(R.id.recycler_view);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
+
+        // Pour la suppression des mission on choisi de ne pas faire de drag and drop
+        //   et de faire supprimer la mission par la droite ou la gauche lors du glissement
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            //Pour du drag and drop (inutiliser dans notre cas)
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+            //Pour des mouvements de glissements
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                adapter.deleteItem(viewHolder.getAdapterPosition());
+            }
+        }).attachToRecyclerView(recyclerView);
+
+        //Détecte le clic sur la mission
+        adapter.setOnClickListener(new MissionAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
+                Mission mission = documentSnapshot.toObject(Mission.class);
+                String id = documentSnapshot.getId();
+                String path = documentSnapshot.getReference().getPath();
+                Toast.makeText(MainMenuActivity.this, "Position: " + position+ " ID: "+id, Toast.LENGTH_SHORT).show();
+                //startActivity(...);
+            }
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        adapter.startListening();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        adapter.stopListening();
+    }
+
+    // Récupération de la photo prise pour ensuite éxecuter la fonction startCrop
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == RESULT_OK  && requestCode == CAMERA_REQUEST_CODE ) {
+
+            if (data != null) {
+                filepath = data.getData();
+            }
+            startCrop(filepath);
+        }else {
+            Uri filepathCrop = null;
+            if (data != null) {
+                filepathCrop = UCrop.getOutput(data);
+            }
+            uploadImage(filepathCrop);
+        }
+    }
+
+    // Fonction qui redimensionne la photo au format du cadre de la photo de profil
+    private void startCrop(@NonNull Uri uri){
+        String destinationFileName = SAMPLE_CROPPED_IMG_NAME;
+        destinationFileName +=".jpg";
+
+        UCrop uCrop = UCrop.of(uri,Uri.fromFile(new File(getCacheDir(), destinationFileName)));
+        uCrop.withAspectRatio(1,1);
+        uCrop.withMaxResultSize(200,200);
+        uCrop.withOptions(getCropOptions());
+        uCrop.start(MainMenuActivity.this);
+    }
+
+    // Option nécessaire au redimensionnement
+    private UCrop.Options getCropOptions(){
+        UCrop.Options options = new UCrop.Options();
+
+        options.setCompressionQuality(70);
+
+        //CompressType
+        //options.setCompressionFormat(Bitmap.CompressFormat.PNG);
+        //options.setCompressionFormat(Bitmap.CompressFormat.JPEG);
+
+        //UI
+        options.setHideBottomControls(false);
+        options.setFreeStyleCropEnabled(false);
+
+        //Colors
+        options.setStatusBarColor(getResources().getColor(R.color.colorOrangeButton));
+        options.setToolbarColor(getResources().getColor(R.color.colorOrangeButton));
+
+        options.setToolbarTitle("Crop Image");
+
+        return options;
+    }
+
+    // ---------------------------------------------- Menu Déconnexion : --------------------------------- :
+
+    // Ouverture d'une boite de dialogue pour vérifier si l'utilisateur souhaite vraiment se déconnecter
     public void LogoutAlertDialog(){
         new AlertDialog.Builder(this, AlertDialog.THEME_DEVICE_DEFAULT_DARK)
-                .setTitle(getString(R.string.sign_out))
+                .setTitle(getString(R.string.log_out))
                 .setMessage(getString(R.string.msg_sign_out))
                 .setCancelable(true)
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(MainMenuActivity.this, "Disconnected",
+                        Toast.makeText(MainMenuActivity.this, getString(R.string.disconnect),
                                 Toast.LENGTH_SHORT).show();
                         userLogout();
                     }
@@ -201,31 +420,12 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
                 .show();
     }
 
-
+    // Déconnexion de l'utilisateur en allant vers l'activité de connexion et en fermant toutes les autres activités lancées
     private void userLogout() {
         mAuth.getInstance().signOut();
         Intent intent = new Intent(MainMenuActivity.this, AuthActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
-    }
-
-    //Fonction qui identifie sur quel bouton l'utilisateur a cliqué
-    @Override
-    public void onClick(View v) {
-        int i = v.getId();
-        if (i == R.id.btnSignOut) {
-           userLogout();
-        }else if(i == R.id.button_add_mission){
-            startActivity(new Intent(MainMenuActivity.this, NewMissionActivity.class));
-        }
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
-            LogoutAlertDialog();
-        }
-        return super.onKeyDown(keyCode, event);
     }
 }

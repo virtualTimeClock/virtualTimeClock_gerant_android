@@ -8,12 +8,20 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:143475226828:android:7e5e2e839087faa2d46a69",
+        "mobilesdk_app_id": "1:143475226828:android:04d7a8943b948630d46a69",
         "android_client_info": {
           "package_name": "com.fr.virtualtimeclock_client"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "143475226828-fv1kfpsjcf5e55rgvn2m5runjf8jdo01.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.fr.virtualtimeclock_client",
+            "certificate_hash": "fb4b55feb03a77fda80821113dc49bbe0d6d58dc"
+          }
+        },
         {
           "client_id": "143475226828-njr4hi54ec3nv1pf6bdturoaogf6cuc5.apps.googleusercontent.com",
           "client_type": 3

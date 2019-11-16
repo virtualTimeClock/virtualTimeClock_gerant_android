@@ -1,8 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
+    <color name="colorPrimary">#cc3d0f</color>
+    <color name="colorPrimaryDark">#ab330d</color>
+    <color name="colorAccent">#ab330f</color>
+    <color name="colorWhite">#fff</color>
+    <color name="colorBlack">#000</color>
+    <color name="navigationBarColor">#ab330d</color>
+
+    //Couleur principale
+    <color name="colorOrangeButton">#d84e21</color>
+    <color name="colorOrangeStart">#bf4e14</color>
+    <color name="colorOrangeEnd">#ef7422</color>
+    <color name="colorOrangeBorder">#1a0a03</color>
+    <color name="colorOrangeMenu">#b53106</color>
+
+    <color name="colorTitleItem">#000</color>
+    <color name="colorDateDescItem">#1f0b00</color>
+    <color name="colorLocationItem">#323232</color>
 
     <color name="grey_100">#323232</color>
     <color name="grey_300">#E0E0E0</color>

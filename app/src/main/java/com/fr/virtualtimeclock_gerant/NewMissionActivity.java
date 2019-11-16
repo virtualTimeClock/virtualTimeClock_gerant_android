@@ -2,15 +2,28 @@ package com.fr.virtualtimeclock_gerant;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -24,12 +37,14 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
-public class NewMissionActivity extends AppCompatActivity {
+public class NewMissionActivity extends AppCompatActivity implements LocationListener {
 
     private static final String TAG = "MissionActivity";
 
@@ -50,8 +65,13 @@ public class NewMissionActivity extends AppCompatActivity {
 
     private Button selectDateStart;
     private Button selectDateStop;
+    private Button geolocalisationBtn;
     private TextView textDateStart;
     private TextView textDateStop;
+
+    private Location location;
+    private final int REQUEST_LOCATION = 200;
+    private boolean DIALOG_ALREADY_RUN = false;
 
     DatePickerDialog datePickerDialogStart;
     DatePickerDialog datePickerDialogStop;
@@ -76,9 +96,15 @@ public class NewMissionActivity extends AppCompatActivity {
 
         selectDateStart = findViewById(R.id.btnDateStart);
         selectDateStop = findViewById(R.id.btnDateStop);
+        geolocalisationBtn = findViewById(R.id.geolocalisation_btn);
         textDateStart = findViewById(R.id.textviewDateStart);
         textDateStop = findViewById(R.id.textviewDateStop);
 
+        // Rendre les zones de textes non sélectionable
+        editTextLatitude.setKeyListener(null);
+        editTextLongitude.setKeyListener(null);
+
+        // Button qui ouvre le calendrier pour choisir la date de début de mission
         selectDateStart.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -93,10 +119,12 @@ public class NewMissionActivity extends AppCompatActivity {
                                 textDateStart.setText((month + 1) + "/" + day + "/" + year);
                             }
                         },year,month,dayOfMonth);
+
                 datePickerDialogStart.show();
             }
         });
 
+        // Button qui ouvre le calendrier pour choisir la date de fin de mission
         selectDateStop.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -111,12 +139,78 @@ public class NewMissionActivity extends AppCompatActivity {
                                 textDateStop.setText((month + 1) + "/" + day + "/" + year);
                             }
                         },year,month,dayOfMonth);
+
                 datePickerDialogStop.show();
             }
         });
 
+        // Button qui récupère les données de localisation de la mission
+        //  - seulement si la localisation est autorisée par l'utilisateur et activée sur le téléphone
+        //  - si ce n'est pas le cas, demande l'activation des permissions et envoie une boîte de dialogue qui propose d'aller activer le GPS
+        geolocalisationBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LocationManager locationManager =  (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                String provider = LocationManager.GPS_PROVIDER;
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(NewMissionActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
+                    } else {
+                        locationManager.requestLocationUpdates(provider, 100, 2, NewMissionActivity.this);
+                        if (locationManager != null) {
+                            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                        }
+                    }
+                }
+                if (locationManager.isProviderEnabled(provider)) {
+                    if (location != null) {
+                        editTextLatitude.setText(String.valueOf(location.getLatitude()));
+                        editTextLongitude.setText(String.valueOf(location.getLongitude()));
+                    }
+                } else {
+                    if(!DIALOG_ALREADY_RUN) {
+                        showGPSDisabledAlertToUser();
+                        DIALOG_ALREADY_RUN = true;
+                    }
+                }
+            }
+        });
     }
 
+    // Boitede dialogue qui propose l'activation du GPS en allant dans les Paramètres
+    private void showGPSDisabledAlertToUser() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,AlertDialog.THEME_DEVICE_DEFAULT_DARK);
+        alertDialogBuilder.setMessage(getString(R.string.gps_disabled))
+                .setCancelable(false)
+                .setPositiveButton(getString(R.string.gps_parameter), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Intent callGPSSettingIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivity(callGPSSettingIntent);
+                    }
+                });
+        alertDialogBuilder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+                DIALOG_ALREADY_RUN = false;
+            }
+        });
+        AlertDialog alert = alertDialogBuilder.create();
+        try {       //try/catch ajouter sinon crash quand on désactive la localisation en étant sur l'activité
+            alert.show();
+        } catch (WindowManager.BadTokenException e) {
+            Toast.makeText(this, getString(R.string.lost_localisation), Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    //Masque le clavier en cliquant ailleurs sur l'écran
+    public void closeKeyboard(View v) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+}
+
+    // Menu qui contient le bouton pour quitter et sauvegarder
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
@@ -124,6 +218,7 @@ public class NewMissionActivity extends AppCompatActivity {
         return true;
     }
 
+    // Execution de la fonction createMission lorsque l'on clique sur le bouton sauvegarder du menu
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
@@ -134,9 +229,7 @@ public class NewMissionActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
-
-
+    // Fonction qui crée et envoie les données saisitent sur la base de données
     public void createMission() {
         String title = editTextTitle.getText().toString();
         String start = textDateStart.getText().toString();
@@ -147,14 +240,31 @@ public class NewMissionActivity extends AppCompatActivity {
         String location = editTextLocalisation.getText().toString();
         String description = editTextDescription.getText().toString();
 
-        //Demande à saisir tous les champs avant d'envoyer
+
+        // Demande à saisir tous les champs avant d'envoyer
         if(title.trim().isEmpty() || start.trim().isEmpty() || start.trim().isEmpty()
                 || latitude.trim().isEmpty() || longitude.trim().isEmpty() || radius.trim().isEmpty()
                 || location.trim().isEmpty() || description.trim().isEmpty()){
             Toast.makeText(this, getString(R.string.emptyField), Toast.LENGTH_SHORT).show();
             return;
         }
+        // Vérifie si la date de début est plus petite que la date de fin
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
+            Date date1 = sdf.parse(start);
+            Date date2 = sdf.parse(stop);
+            if(!(date1.compareTo(date2)<0)){
+                Toast.makeText(this, getString(R.string.error_date), Toast.LENGTH_SHORT).show();
+                return;
 
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Map qui contient les clés (nom des clés dans la base de données) et les valeurs(valeurs des clés)
+        //    à qu'on ajoute chaque donnée qui ont été saisie avant d'être envoyés
         Map<String, Object> mission = new HashMap<>();
         mission.put(KEY_TITLE, title);
         mission.put(KEY_DATE_START, new Timestamp(new Date(start)));
@@ -169,6 +279,7 @@ public class NewMissionActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Toast.makeText(NewMissionActivity.this,getString(R.string.creation_mission_send) , Toast.LENGTH_SHORT).show();
+                        finish();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -179,7 +290,27 @@ public class NewMissionActivity extends AppCompatActivity {
         });
     }
 
-    public void back(View v){
-        finish();
+    // Affiche les coordonnées en temps réel de l'utilisateur
+    @Override
+    public void onLocationChanged(Location location) {
+        editTextLatitude.setText(String.valueOf(location.getLatitude()));
+        editTextLongitude.setText(String.valueOf(location.getLongitude()));
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) { /*Pas utilisé*/ }
+
+    @Override
+    public void onProviderEnabled(String provider) { /*Pas utilisé */ }
+
+    //Détection quand la localisation est désactivé
+    @Override
+    public void onProviderDisabled(String provider) {
+        if (provider.equals(LocationManager.GPS_PROVIDER)) {
+            if(!DIALOG_ALREADY_RUN) {
+                showGPSDisabledAlertToUser();
+                DIALOG_ALREADY_RUN = true;
+            }
+        }
     }
 }

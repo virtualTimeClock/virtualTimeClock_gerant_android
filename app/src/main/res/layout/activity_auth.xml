@@ -8,56 +8,57 @@
     android:orientation="vertical"
     tools:context=".AuthActivity">
 
-    <TextView
-        android:id="@+id/state"
-        android:gravity="center"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:textSize="30dp"
-        android:textColor="@android:color/holo_red_dark"
-        android:layout_height="wrap_content"/>
+        android:layout_height="match_parent"
+        android:onClick="closeKeyboard">
 
         <LinearLayout
-            android:id="@+id/emailPasswordFields"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <EditText
-                android:id="@+id/fieldEmail"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:id="@+id/emailPasswordFields"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="@string/hint_email"
-                android:inputType="textEmailAddress" />
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
 
-            <EditText
-                android:id="@+id/fieldPassword"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="@string/hint_password"
-                android:inputType="textPassword" />
+                <EditText
+                    android:id="@+id/fieldEmail"
+                    android:layout_width="260dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:hint="@string/hint_email"
+                    android:inputType="textEmailAddress"
+                    android:textColor="@color/colorWhite"
+                    android:textColorHint="@color/grey_500" />
+
+                <EditText
+                    android:id="@+id/fieldPassword"
+                    android:layout_width="260dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:hint="@string/hint_password"
+                    android:inputType="textPassword"
+                    android:textColor="@color/colorWhite"
+                    android:textColorHint="@color/grey_500" />
+
+                <Button
+                    android:id="@+id/emailLogInButton"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="260dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="60dp"
+                    android:background="@drawable/roundedbutton"
+                    android:text="@string/log_in"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
         </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/emailPasswordButtons"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/emailPasswordFields"
-            android:orientation="horizontal"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
-
-            <Button
-                android:id="@+id/emailSignInButton"
-                style="@style/Widget.AppCompat.Button.Colored"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/sign_in"/>
-
-        </LinearLayout>
-
+    </FrameLayout>
 </LinearLayout>

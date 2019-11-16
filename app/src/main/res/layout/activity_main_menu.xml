@@ -1,46 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/grey_100"
-    android:layout_height="match_parent"
     tools:context=".MainMenuActivity">
 
 
-
+    <!-- - - - - - - - LAYOUT DU PROFIL - - - - - - - -->
     <LinearLayout
         android:id="@+id/layout_profile"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="vertical"
         android:visibility="gone"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <TextView
-            android:id="@+id/email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textSize="30sp"/>
-
-        <Button
-            android:id="@+id/btnSignOut"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/sign_out"/>
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
 
-        <TextView
-            android:id="@+id/txtText"
-            android:textSize="50sp"
-            android:layout_gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Mission" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorWhite"
+                android:textSize="30sp"
+                android:text="@string/mailEntreprise"/>
+
+            <TextView
+                android:id="@+id/email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="20sp"/>
+
+            <RelativeLayout
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_marginBottom="30dp"
+                android:layout_marginTop="45dp"
+                android:padding="3dp"
+                android:background="@drawable/image_border">
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="2dp"
+                android:src="@drawable/ic_company_empty" />
+            </RelativeLayout>
+
+
+            <Button
+                android:id="@+id/upload"
+                android:layout_width="260dp"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:background="@drawable/roundedbutton"
+                android:textColor="@android:color/white"
+                android:drawableLeft="@drawable/ic_photo"
+                android:text="@string/upload"/>
+
+        </LinearLayout>
     </LinearLayout>
 
+    <!-- - - - - - - - LAYOUT DES EMPLOYEES - - - - - - - -->
     <LinearLayout
         android:id="@+id/layout_employee"
         android:layout_width="match_parent"
@@ -57,13 +90,21 @@
             android:layout_gravity="center"
             android:text="les employées"
             android:textSize="30sp"/>
+
+        <Button
+            android:id="@+id/testBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="test"/>
     </LinearLayout>
 
+    <!-- - - - - - - - LAYOUT DES MISSIONS - - - - - - - -->
     <LinearLayout
         android:id="@+id/layout_mission"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:visibility="visible"
         android:orientation="vertical"
         android:gravity="center_vertical">
 
@@ -81,32 +122,29 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|end"
-                android:backgroundTint="@android:color/holo_red_dark"
+                android:backgroundTint="@color/colorOrangeMenu"
                 android:layout_margin="16dp"
                 android:src="@drawable/ic_add"/>
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-
-
     </LinearLayout>
 
+    <!-- - - - - - - - HORIZONTAL MENU BAR - - - - - - - -->
     <com.darwindeveloper.horizontalscrollmenulibrary.custom_views.HorizontalScrollMenuView
-        android:background="@drawable/border"
         android:id="@+id/menu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:backgroundMenuColor="@color/colorPrimaryDark"
-        app:icon_width="25dp"
-        app:icon_height="25dp"
-        app:item_backgroundColor="@color/colorPrimaryDark"
-        app:item_colorSelected="@android:color/holo_red_dark"
-        app:item_marginBottom="4dp"
-        app:item_marginLeft="4dp"
-        app:item_marginRight="4dp"
-        app:item_marginTop="4dp"
-        app:item_textColor="#fff"
-        app:item_textSize="7sp"
-        />
+        app:icon_width="17dp"
+        app:icon_height="17dp"
+        app:backgroundMenuColor="@color/colorPrimary"
+        app:item_backgroundColor="@color/colorPrimary"
+        app:item_colorSelected="@color/grey_100"
+        app:item_textColor="@color/colorWhite"
+        app:item_marginBottom="1dp"
+        app:item_marginLeft="1dp"
+        app:item_marginRight="1dp"
+        app:item_marginTop="1dp"
+        app:item_textSize="4sp"/>
 
 </LinearLayout>

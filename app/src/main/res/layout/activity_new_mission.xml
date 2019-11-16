@@ -9,115 +9,194 @@
     android:padding="16dp"
     tools:context=".NewMissionActivity">
 
-    <EditText
-        android:id="@+id/edit_text_title"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/titre"
-        android:inputType="text"/>
+        android:layout_height="match_parent"
+        android:onClick="closeKeyboard">
 
-    <LinearLayout
-        android:id="@+id/linearLayoutDateStart"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingRight="15dp"
-        tools:context=".MissionActivity">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/grey_100"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <TextView
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"
-            android:textSize="18dp"
-            android:textColor="@android:color/white"
-            android:text="@string/dateFormatStart"/>
+            <EditText
+                android:id="@+id/edit_text_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/titre"
+                android:inputType="text"
+                android:textColor="@color/colorWhite"
+                android:textColorHint="@color/grey_500" />
 
-        <TextView
-            android:id="@+id/textviewDateStart"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textColor="@android:color/white"
-            android:layout_weight="1"
-            android:text="@string/dateFormat" />
+            <LinearLayout
+                android:id="@+id/linearLayoutDateStart"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:orientation="horizontal"
+                android:paddingEnd="15dp"
+                tools:context=".MissionActivity">
 
-        <Button
-            android:id="@+id/btnDateStart"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textColor="@android:color/white"
-            android:drawableLeft="@drawable/ic_calendar"
-            android:text="@string/calend"/>
+                <TextView
+                    android:layout_width="65dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dateFormatStart"
+                    android:textColor="@android:color/white"
+                    android:textSize="18sp" />
 
-    </LinearLayout>
+                <TextView
+                    android:id="@+id/textviewDateStart"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="13sp"
+                    android:layout_weight="1"
+                    android:text="@string/dateFormat"
+                    android:textColor="@color/grey_500" />
 
-    <LinearLayout
-        android:id="@+id/linearLayoutDateStop"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingRight="15dp"
-        tools:context=".MissionActivity">
+                <Button
+                    android:id="@+id/btnDateStart"
+                    android:layout_width="30dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:textSize="12sp"
+                    android:background="@drawable/roundedbutton"
+                    android:drawableStart="@drawable/ic_calendar"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="@string/calend"
+                    android:textColor="@android:color/white" />
 
-        <TextView
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"
-            android:textSize="18dp"
-            android:textColor="@android:color/white"
-            android:text="@string/dateFormatStop"/>
+            </LinearLayout>
 
-        <TextView
-            android:id="@+id/textviewDateStop"
-            android:layout_width="0dp"
-            android:textColor="@android:color/white"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/dateFormat" />
+            <LinearLayout
+                android:id="@+id/linearLayoutDateStop"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingEnd="15dp"
+                tools:context=".MissionActivity">
 
-        <Button
-            android:id="@+id/btnDateStop"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textColor="@android:color/white"
-            android:drawableLeft="@drawable/ic_calendar"
-            android:text="@string/calend"/>
+                <TextView
+                    android:layout_width="65dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dateFormatStop"
+                    android:textColor="@android:color/white"
+                    android:textSize="18dp" />
 
-    </LinearLayout>
+                <TextView
+                    android:id="@+id/textviewDateStop"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="13sp"
+                    android:layout_weight="1"
+                    android:text="@string/dateFormat"
+                    android:textColor="@color/grey_500" />
 
-    <EditText
-        android:id="@+id/edit_text_latitude"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/latitude"
-        android:inputType="date"/>
+                <Button
+                    android:id="@+id/btnDateStop"
+                    android:layout_width="30dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginBottom="6dp"
+                    android:textSize="12sp"
+                    android:layout_weight="1"
+                    android:background="@drawable/roundedbutton"
+                    android:drawableStart="@drawable/ic_calendar"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="@string/calend"
+                    android:textColor="@android:color/white" />
 
-    <EditText
-        android:id="@+id/edit_text_longitude"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/longitude"
-        android:inputType="date"/>
+            </LinearLayout>
 
-    <EditText
-        android:id="@+id/edit_text_radius"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/radius"
-        android:inputType="number"/>
+            <LinearLayout
+                android:id="@+id/geolocalisation_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-    <EditText
-        android:id="@+id/edit_text_localisation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/location"
-        android:inputType="text"/>
+                <LinearLayout
+                    android:id="@+id/long_and_lat_layout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/edit_text_description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Description"
-        android:inputType="text"/>
+                    <EditText
+                        android:id="@+id/edit_text_latitude"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/latitude"
+                        android:inputType="date"
+                        android:clickable="false"
+                        android:textColor="@color/colorWhite"
+                        android:textColorHint="@color/grey_500" />
 
+                    <EditText
+                        android:id="@+id/edit_text_longitude"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:hint="@string/longitude"
+                        android:inputType="date"
+                        android:textColor="@color/colorWhite"
+                        android:textColorHint="@color/grey_500" />
+                </LinearLayout>
 
+                <LinearLayout
+                    android:id="@+id/geolocalisation_btn_layout"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <Button
+                        android:id="@+id/geolocalisation_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="15dp"
+                        android:layout_marginStart="15dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/roundedbutton"
+                        android:drawableStart="@drawable/ic_position"
+                        android:textSize="12sp"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:text="@string/get_pos"
+                        android:textColor="@android:color/white" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/edit_text_radius"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/radius"
+                android:inputType="number"
+                android:textColor="@color/colorWhite"
+                android:textColorHint="@color/grey_500" />
+
+            <EditText
+                android:id="@+id/edit_text_localisation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/location"
+                android:inputType="text"
+                android:textColor="@color/colorWhite"
+                android:textColorHint="@color/grey_500" />
+
+            <EditText
+                android:id="@+id/edit_text_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/description"
+                android:inputType="text"
+                android:textColor="@color/colorWhite"
+                android:textColorHint="@color/grey_500" />
+        </LinearLayout>
+    </FrameLayout>
 </LinearLayout>

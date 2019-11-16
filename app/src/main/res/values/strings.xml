@@ -2,17 +2,12 @@
     <string name="app_name" translatable="false">Virtual Time Clock - Gérant</string>
     <string name="loading">Loading...</string>
     <string name="create_account">Create Account</string>
-    <string name="sign_in">Sign In</string>
-    <string name="sign_out">Sign Out</string>
+    <string name="log_out">Log Out</string>
     <string name="signed_out">Signed Out</string>
     <string name="hint_email">Email</string>
     <string name="hint_password">Password</string>
     <string name="verify_email">Verify Email</string>
     <string name="auth_failed">Authentication failed</string>
-    <string name="emailpassword_title_text">Email and Password</string>
-    <string name="emailpassword_status_fmt">Email User: %s</string>
-    <string name="firebase_status_fmt">Firebase User: %s</string>
-    <string name="desc_firebase_lockup">Firebase logo and name</string>
     <string name="titre">Title</string>
     <string name="date_start">Date start</string>
     <string name="date_stop">date-stop</string>
@@ -22,16 +17,26 @@
     <string name="radius">Radius</string>
     <string name="creation_mission_send">Mission Saved</string>
     <string name="creation_mission_fail">Error Send</string>
-    <string name="firebase_statue_fmt_null">FIrebase User:</string>
-    <string name="isLeader" translatable="false">%s</string>
     <string name="its_not_a_leader">You are not a leader !</string>
     <string name="its_a_leader_sucess_connection">Sucess connection !</string>
     <string name="msg_sign_out">Are you sure you want to log out?</string>
     <string name="save">Save</string>
-    <string name="emptyField">Please insert all information before sending</string>
+    <string name="emptyField">Please insert all information</string>
     <string name="addMission">Add Mission</string>
     <string name="calend">Calendar</string>
     <string name="dateFormatStart">"Start : "</string>
     <string name="dateFormatStop">"End : "</string>
     <string name="dateFormat">Month/Day/Year</string>
+    <string name="log_in">Log in</string>
+    <string name="error">Error !</string>
+    <string name="description">Description</string>
+    <string name="mailEntreprise">"Company : "</string>
+    <string name="upload">Capture and Upload</string>
+    <string name="disconnect">Disconnected</string>
+    <string name="load_img_failed">Fail to load image</string>
+    <string name="error_date">End date must be greater than start date !</string>
+    <string name="get_pos">Get position</string>
+    <string name="gps_parameter">Goto Settings Page To Enable GPS</string>
+    <string name="gps_disabled">GPS is disabled in your device. Would you like to enable it ?</string>
+    <string name="lost_localisation">Localisation lost</string>
 </resources>
