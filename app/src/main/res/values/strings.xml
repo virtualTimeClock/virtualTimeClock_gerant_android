@@ -39,4 +39,9 @@
     <string name="gps_parameter">Goto Settings Page To Enable GPS</string>
     <string name="gps_disabled">GPS is disabled in your device. Would you like to enable it ?</string>
     <string name="lost_localisation">Localisation lost</string>
+    <string name="suppression">Suppression</string>
+    <string name="suppression_msg">Are you sure you want to delete all the data entered ?</string>
+    <string name="suppression_data_success">All data has been deleted</string>
+    <string name="suppression_data_cancel">Delete canceled</string>
+    <string name="can_delete">You can delete everything by shaking the device.</string>
 </resources>

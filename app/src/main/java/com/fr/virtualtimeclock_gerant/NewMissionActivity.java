@@ -12,6 +12,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -72,6 +76,13 @@ public class NewMissionActivity extends AppCompatActivity implements LocationLis
     private Location location;
     private final int REQUEST_LOCATION = 200;
     private boolean DIALOG_ALREADY_RUN = false;
+    private boolean DIALOG_DELETE_DATA_ALREADY_RUN = false;
+    private boolean LOCALISATION_PRESSED = false;
+
+    private SensorManager sm;
+    private float acelVal;  //valeur actuel de l'acceleration et gravité
+    private float acelLast; //dernière valeuur de l'acceleration et gravité
+    private float shake;    //différence de la veleur de l'acceleration et la gravité
 
     DatePickerDialog datePickerDialogStart;
     DatePickerDialog datePickerDialogStop;
@@ -99,6 +110,12 @@ public class NewMissionActivity extends AppCompatActivity implements LocationLis
         geolocalisationBtn = findViewById(R.id.geolocalisation_btn);
         textDateStart = findViewById(R.id.textviewDateStart);
         textDateStop = findViewById(R.id.textviewDateStop);
+
+        sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        sm.registerListener(sensorListener, sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+        acelVal = SensorManager.GRAVITY_EARTH;
+        acelLast = SensorManager.GRAVITY_EARTH;
+        shake = 0.00f;
 
         // Rendre les zones de textes non sélectionable
         editTextLatitude.setKeyListener(null);
@@ -152,6 +169,7 @@ public class NewMissionActivity extends AppCompatActivity implements LocationLis
             public void onClick(View v) {
                 LocationManager locationManager =  (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 String provider = LocationManager.GPS_PROVIDER;
+                LOCALISATION_PRESSED = true;
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -180,16 +198,16 @@ public class NewMissionActivity extends AppCompatActivity implements LocationLis
 
     // Boitede dialogue qui propose l'activation du GPS en allant dans les Paramètres
     private void showGPSDisabledAlertToUser() {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,AlertDialog.THEME_DEVICE_DEFAULT_DARK);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this, AlertDialog.THEME_DEVICE_DEFAULT_DARK);
         alertDialogBuilder.setMessage(getString(R.string.gps_disabled))
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.gps_parameter), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        DIALOG_ALREADY_RUN = false;
                         Intent callGPSSettingIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                         startActivity(callGPSSettingIntent);
                     }
-                });
-        alertDialogBuilder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.cancel();
                 DIALOG_ALREADY_RUN = false;
@@ -290,20 +308,69 @@ public class NewMissionActivity extends AppCompatActivity implements LocationLis
         });
     }
 
+    // Fonction de secousse pour supprimer toutes les données saisies seulement si l'utilisteur valide un boite de dialogue de confirmation
+    private final SensorEventListener sensorListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            float x = event.values[0];
+            float y = event.values[1];
+            float z = event.values[2];
+
+            acelLast = acelVal;
+            acelVal = (float) Math.sqrt((double) (x*x + y*y + z*z));
+            float delta = acelVal - acelLast;
+            shake = shake * 0.9f + delta;
+
+            if(shake > 13){
+                if(!DIALOG_DELETE_DATA_ALREADY_RUN) {
+                    new AlertDialog.Builder(NewMissionActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_DARK)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle(getString(R.string.suppression))
+                        .setMessage(getString(R.string.suppression_msg))
+                        .setCancelable(false)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                DIALOG_DELETE_DATA_ALREADY_RUN = false;
+                                editTextTitle.setText("");
+                                textDateStart.setText(getString(R.string.dateFormat));
+                                textDateStop.setText(getString(R.string.dateFormat));
+                                editTextLatitude.setText("");
+                                editTextLongitude.setText("");
+                                editTextRadius.setText("");
+                                editTextLocalisation.setText("");
+                                editTextDescription.setText("");
+                                Toast.makeText(getApplicationContext(),getString(R.string.suppression_data_success),Toast.LENGTH_LONG).show();
+                            }
+                        }).setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                DIALOG_DELETE_DATA_ALREADY_RUN = false;
+                                Toast.makeText(getApplicationContext(),getString(R.string.suppression_data_cancel),Toast.LENGTH_LONG).show();
+                            }
+                        }).show();
+                }
+                DIALOG_DELETE_DATA_ALREADY_RUN = true;
+            }
+        }
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) { /*Pas utilisé*/ }
+    };
+
     // Affiche les coordonnées en temps réel de l'utilisateur
     @Override
     public void onLocationChanged(Location location) {
-        editTextLatitude.setText(String.valueOf(location.getLatitude()));
-        editTextLongitude.setText(String.valueOf(location.getLongitude()));
+        if(LOCALISATION_PRESSED){
+            editTextLatitude.setText(String.valueOf(location.getLatitude()));
+            editTextLongitude.setText(String.valueOf(location.getLongitude()));
+            LOCALISATION_PRESSED = false;
+        }
     }
-
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) { /*Pas utilisé*/ }
-
     @Override
     public void onProviderEnabled(String provider) { /*Pas utilisé */ }
-
-    //Détection quand la localisation est désactivé
+    //Détection quand la localisation est désactivé affiche la boite de dialogue pour la réactiver
     @Override
     public void onProviderDisabled(String provider) {
         if (provider.equals(LocationManager.GPS_PROVIDER)) {

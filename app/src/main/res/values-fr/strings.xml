@@ -39,4 +39,9 @@
     <string name="gps_parameter">Ouvir Paramètres pour l\'activer</string>
     <string name="gps_disabled">Le GPS est désactivé. Souhaitez-vous l\'activer ?</string>
     <string name="lost_localisation">Localisation perdu</string>
+    <string name="suppression">Suppression</string>
+    <string name="suppression_msg">Êtes-vous sûr de vouloir supprimer toutes les données saisies ?</string>
+    <string name="suppression_data_cancel">Suppression annulée</string>
+    <string name="suppression_data_success">Toutes les données ont été supprimées</string>
+    <string name="can_delete">Vous pouvez tout supprimer en secouer l\'appareil.</string>
 </resources>

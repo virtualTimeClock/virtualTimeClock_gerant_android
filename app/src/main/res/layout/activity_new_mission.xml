@@ -197,6 +197,14 @@
                 android:inputType="text"
                 android:textColor="@color/colorWhite"
                 android:textColorHint="@color/grey_500" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textStyle="italic"
+                android:textSize="14sp"
+                android:text="@string/can_delete" />
         </LinearLayout>
     </FrameLayout>
 </LinearLayout>
