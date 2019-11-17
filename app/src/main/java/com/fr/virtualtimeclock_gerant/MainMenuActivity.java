@@ -12,6 +12,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -82,12 +83,20 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
     private File photoFile;
     private Uri filepath;
 
+    MediaPlayer on;
+    MediaPlayer off;
+    MediaPlayer error;
+
     private String imgURL = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
+
+        on = MediaPlayer.create(this, R.raw.sound_on);
+        off = MediaPlayer.create(this, R.raw.sound_off);
+        error = MediaPlayer.create(this, R.raw.error_sound);
 
         menu = findViewById(R.id.menu);
         userEmail = findViewById(R.id.email);
@@ -114,6 +123,11 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
         loadProfilePicture();
     }
 
+    //Jouer un son
+    public void mediaPlayer(MediaPlayer m) {
+        m.start();
+    }
+
     // Création du menu avec toutes les onglets contenant les images et lors du clic sur un onglet
     //     il affiche le layout qui lui correspond en masquant les autres
     private void initMenuBar() {
@@ -132,6 +146,7 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
                 else if(menuItem.getText().equals("Logout"))mainMenu = "Logout";
                 switch(mainMenu){
                     case "Profile":
+                        mediaPlayer(on);
                         menu.setItemSelected(0);
                         menu.editItem(0,"Profile",R.drawable.ic_profile_selected,false,0);
                         menu.editItem(1,"Employee",R.drawable.ic_employee,false,0);
@@ -142,6 +157,7 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
                         findViewById(R.id.layout_mission).setVisibility(View.GONE);
                         break;
                     case "Employee":
+                        mediaPlayer(on);
                         menu.setItemSelected(1);
                         menu.editItem(0,"Profile",R.drawable.ic_profile,false,0);
                         menu.editItem(1,"Employee",R.drawable.ic_employee_selected,false,0);
@@ -152,6 +168,7 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
                         findViewById(R.id.layout_mission).setVisibility(View.GONE);
                         break;
                     case "Mission":
+                        mediaPlayer(on);
                         menu.setItemSelected(2);
                         menu.editItem(0,"Profile",R.drawable.ic_profile,false,0);
                         menu.editItem(1,"Employee",R.drawable.ic_employee,false,0);
@@ -175,10 +192,13 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
     public void onClick(View v) {
         int i = v.getId();
         if(i == R.id.button_add_mission){
+            mediaPlayer(on);
             startActivity(new Intent(MainMenuActivity.this, NewMissionActivity.class));
         }else if(i == R.id.upload){
+            mediaPlayer(on);
             dispatchPictureTakerAction();
         }else if(i == R.id.button_add_employee){
+            mediaPlayer(on);
             startActivity(new Intent(MainMenuActivity.this, NewEmployeeActivity.class));
         }
     }
@@ -279,7 +299,6 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
 
     // Affichage des employés ordonnées par nom
     // Suppression des employés avec des swipes latéraux
-    // Ouverture des détails des employés
     private void setUpRecyclerViewEmployee() {
         Query query = employeeRef.orderBy("nom", Query.Direction.ASCENDING);
 
@@ -308,18 +327,6 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
                 employeeAdapter.deleteItem(viewHolder.getAdapterPosition());
             }
         }).attachToRecyclerView(recyclerView_employee);
-
-        //Détecte le clic sur l'employée
-        employeeAdapter.setOnClickListener(new EmployeeAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
-                Employee employee = documentSnapshot.toObject(Employee.class);
-                String id = documentSnapshot.getId();
-                String path = documentSnapshot.getReference().getPath();
-                Toast.makeText(MainMenuActivity.this, "Position: " + position+ " ID: "+id, Toast.LENGTH_SHORT).show();
-                //startActivity(...);
-            }
-        });
     }
 
     // ---------------------------------------------- Menu Missions : ----------------------------------- :
@@ -356,15 +363,14 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
             }
         }).attachToRecyclerView(recyclerView);
 
-        //Détecte le clic sur la mission
+        //Détecte le clic sur la mission et envoi via putExtra du chemin pour pouvoir lire le document sélectionné
         missionsAdapter.setOnClickListener(new MissionAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
-                Mission mission = documentSnapshot.toObject(Mission.class);
-                String id = documentSnapshot.getId();
                 String path = documentSnapshot.getReference().getPath();
-                Toast.makeText(MainMenuActivity.this, "Position: " + position+ " ID: "+id, Toast.LENGTH_SHORT).show();
-                //startActivity(...);
+                Intent startCompleteMenuActivity = new Intent(MainMenuActivity.this, CompleteMissionActivity.class);
+                startCompleteMenuActivity.putExtra("DOCUMENT_PATH", path);
+                startActivity(startCompleteMenuActivity);
             }
         });
     }
@@ -443,6 +449,7 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
 
     // Ouverture d'une boite de dialogue pour vérifier si l'utilisateur souhaite vraiment se déconnecter
     public void LogoutAlertDialog(){
+        mediaPlayer(off);
         new AlertDialog.Builder(this, AlertDialog.THEME_DEVICE_DEFAULT_DARK)
                 .setTitle(getString(R.string.log_out))
                 .setMessage(getString(R.string.msg_sign_out))

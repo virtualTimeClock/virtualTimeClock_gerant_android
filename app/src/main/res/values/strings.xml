@@ -6,7 +6,7 @@
     <string name="signed_out">Signed Out</string>
     <string name="hint_email">Email</string>
     <string name="hint_password">Password</string>
-    <string name="verify_email">Verify Email</string>
+    <string name="verify_email">Verify email</string>
     <string name="auth_failed">Authentication failed</string>
     <string name="titre">Title</string>
     <string name="date_start">Date start</string>
@@ -47,12 +47,21 @@
     <string name="name">Name</string>
     <string name="firstname">Firstname</string>
     <string name="textviewBirthday">"Birthday : "</string>
-    <string name="email">E-mail</string>
+    <string name="email">Email</string>
     <string name="email_validation">E-mail Validation</string>
-    <string name="creation_employee_send">Employee Created</string>
+    <string name="creation_employee_send">Employee created</string>
     <string name="creation_employee_fail">Error Send</string>
     <string name="addEmployee">Add Employee</string>
     <string name="email_different">The emails you have entered are not the same</string>
     <string name="creation_employee_mail_fail">Account Creation failed</string>
     <string name="error_birthday">The birthday must be smallet than the current date</string>
+    <string name="doc_dont_exit">Document does not exist</string>
+    <string name="showMission">Detailled mission</string>
+    <string name="titreFormat">"Title : "</string>
+    <string name="lieuFormat">Location :</string>
+    <string name="latitudeFormat">"Latitude : "</string>
+    <string name="longitudeFormat">"Longitude : "</string>
+    <string name="rayonFormat">"Radius : "</string>
+    <string name="descriptionFormat">"Description : "</string>
+    <string name="app">Virtual Time Clock</string>
 </resources>

@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -27,6 +28,8 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
 
     private static final String TAG = "EmailPassword";
 
+    MediaPlayer on;
+    MediaPlayer error;
 
     private EditText mEmailField;
     private EditText mPasswordField;
@@ -41,6 +44,9 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
 
+        on = MediaPlayer.create(this, R.raw.sound_on);
+        error = MediaPlayer.create(this, R.raw.error_sound);
+
         mEmailField = findViewById(R.id.fieldEmail);
         mPasswordField = findViewById(R.id.fieldPassword);
 
@@ -48,6 +54,11 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+    }
+
+    //Jouer un son
+    public void mediaPlayer(MediaPlayer m) {
+        m.start();
     }
 
     //Masque le clavier en cliquant ailleurs sur l'écran
@@ -124,6 +135,7 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
 
 
     public void FailLogInAlertDialog(String errorMsg){
+        mediaPlayer(error);
         new AlertDialog.Builder(this, AlertDialog.THEME_DEVICE_DEFAULT_DARK)
                 .setTitle(getString(R.string.error))
                 .setMessage(errorMsg)
@@ -140,8 +152,10 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
         //Bouton qui envoie l'email et le mdp saisite dans la fonction signIn pour essayer d'établir une connexion
         if (i == R.id.emailLogInButton) {
             if(!(mEmailField.getText().toString().trim().isEmpty() || mPasswordField.getText().toString().trim().isEmpty()) ) {
+                mediaPlayer(on);
                 signIn(mEmailField.getText().toString(), mPasswordField.getText().toString());
             }else{
+                mediaPlayer(error);
                 Toast.makeText(this, getString(R.string.emptyField), Toast.LENGTH_SHORT).show();
             }
         }

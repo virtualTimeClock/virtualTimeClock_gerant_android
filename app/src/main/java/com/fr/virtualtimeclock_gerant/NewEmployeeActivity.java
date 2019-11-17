@@ -11,6 +11,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -67,6 +68,10 @@ public class NewEmployeeActivity extends AppCompatActivity {
 
     private String currentDate;
 
+    MediaPlayer on;
+    MediaPlayer off;
+    MediaPlayer error;
+
     private SensorManager sm;
     private float acelVal;  //valeur actuel de l'acceleration et gravité
     private float acelLast; //dernière valeuur de l'acceleration et gravité
@@ -95,6 +100,10 @@ public class NewEmployeeActivity extends AppCompatActivity {
         selectBirthday = findViewById(R.id.btnBirthday);
         textBirthday = findViewById(R.id.textviewBirthday);
 
+        on = MediaPlayer.create(this, R.raw.sound_on);
+        off = MediaPlayer.create(this, R.raw.sound_off);
+        error = MediaPlayer.create(this, R.raw.error_sound);
+
         // Maintenir l'utilisateur connecté sans qu'il change de compte à cause de la
         //      connexion automatique lors de la création d'une autre utilisateur
         mAuth1 = FirebaseAuth.getInstance();
@@ -118,6 +127,7 @@ public class NewEmployeeActivity extends AppCompatActivity {
         selectBirthday.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mediaPlayer(on);
                 final Calendar calendar = Calendar.getInstance();
                 int year = calendar.get(Calendar.YEAR);
                 int month = calendar.get(Calendar.MONTH);
@@ -136,6 +146,11 @@ public class NewEmployeeActivity extends AppCompatActivity {
         });
     }
 
+    //Jouer un son
+    public void mediaPlayer(MediaPlayer m) {
+        m.start();
+    }
+
     // Fonction qui crée et envoie les données saisitent sur la base de données
     public void createEmployee() {
         String name = editTextName.getText().toString();
@@ -150,6 +165,7 @@ public class NewEmployeeActivity extends AppCompatActivity {
         boolean verif_date = getString(R.string.dateFormat).equals(birthday);
         if(verif_date || name.trim().isEmpty() || firstname.trim().isEmpty() || birthday.trim().isEmpty()
                 || email.trim().isEmpty() || email_verif.trim().isEmpty()){
+            mediaPlayer(error);
             Toast.makeText(this, getString(R.string.emptyField), Toast.LENGTH_SHORT).show();
             return;
         }
@@ -160,6 +176,7 @@ public class NewEmployeeActivity extends AppCompatActivity {
             Date birth = sdf.parse(birthday);
             Date current = sdf.parse(currentDate);
             if(!(birth.compareTo(current)<0)){
+                mediaPlayer(error);
                 Toast.makeText(this, getString(R.string.error_birthday), Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -170,6 +187,7 @@ public class NewEmployeeActivity extends AppCompatActivity {
         // Vérification que les emails sont identiques
         boolean same_email = email.equals(email_verif);
         if (!same_email){
+            mediaPlayer(error);
             Toast.makeText(this, getString(R.string.email_different), Toast.LENGTH_SHORT).show();
             return;
         }
@@ -186,12 +204,14 @@ public class NewEmployeeActivity extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
+                        mediaPlayer(on);
                         Toast.makeText(NewEmployeeActivity.this,getString(R.string.creation_employee_send) , Toast.LENGTH_SHORT).show();
                         finish();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
+                mediaPlayer(error);
                 Toast.makeText(NewEmployeeActivity.this,getString(R.string.creation_employee_fail), Toast.LENGTH_SHORT).show();
                 Log.d(TAG, e.toString());
             }
@@ -246,6 +266,7 @@ public class NewEmployeeActivity extends AppCompatActivity {
     }
 
     // Execution de la fonction createEmployee lorsque l'on clique sur le bouton sauvegarder du menu
+    // Fermeture de l'activité quand on clic sur la croix
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
@@ -253,6 +274,7 @@ public class NewEmployeeActivity extends AppCompatActivity {
                 createEmployee();
                 return true;
             case android.R.id.home:
+                mediaPlayer(off);
                 this.finish();
                 return true;
         }
@@ -274,6 +296,7 @@ public class NewEmployeeActivity extends AppCompatActivity {
 
             if(shake > 13){
                 if(!DIALOG_DELETE_DATA_ALREADY_RUN) {
+                    mediaPlayer(off);
                     AlertDialog.Builder alert = new AlertDialog.Builder(NewEmployeeActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_DARK)
                             .setIcon(android.R.drawable.ic_dialog_alert)
                             .setTitle(getString(R.string.suppression))

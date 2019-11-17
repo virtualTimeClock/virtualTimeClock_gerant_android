@@ -16,8 +16,7 @@ public class Home extends Application {
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
         if(currentUser != null){
-            startActivity(new Intent(Home.this, MainMenuActivity.class));
+            startActivity(new Intent(Home.this, StartingActivity.class));
         }
     }
-
 }

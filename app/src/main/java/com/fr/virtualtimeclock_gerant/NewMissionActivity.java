@@ -19,6 +19,7 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -87,6 +88,10 @@ public class NewMissionActivity extends AppCompatActivity implements LocationLis
     DatePickerDialog datePickerDialogStart;
     DatePickerDialog datePickerDialogStop;
 
+    MediaPlayer on;
+    MediaPlayer off;
+    MediaPlayer error;
+
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
@@ -117,6 +122,10 @@ public class NewMissionActivity extends AppCompatActivity implements LocationLis
         acelLast = SensorManager.GRAVITY_EARTH;
         shake = 0.00f;
 
+        on = MediaPlayer.create(this, R.raw.sound_on);
+        off = MediaPlayer.create(this, R.raw.sound_off);
+        error = MediaPlayer.create(this, R.raw.error_sound);
+
         // Rendre les zones de textes non sélectionable
         editTextLatitude.setKeyListener(null);
         editTextLongitude.setKeyListener(null);
@@ -125,6 +134,7 @@ public class NewMissionActivity extends AppCompatActivity implements LocationLis
         selectDateStart.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+                mediaPlayer(on);
                 Calendar calendar = Calendar.getInstance();
                 int year = calendar.get(Calendar.YEAR);
                 int month = calendar.get(Calendar.MONTH);
@@ -145,6 +155,7 @@ public class NewMissionActivity extends AppCompatActivity implements LocationLis
         selectDateStop.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+                mediaPlayer(on);
                 Calendar calendar = Calendar.getInstance();
                 int year = calendar.get(Calendar.YEAR);
                 int month = calendar.get(Calendar.MONTH);
@@ -196,8 +207,14 @@ public class NewMissionActivity extends AppCompatActivity implements LocationLis
         });
     }
 
+    //Jouer un son
+    public void mediaPlayer(MediaPlayer m) {
+        m.start();
+    }
+
     // Boitede dialogue qui propose l'activation du GPS en allant dans les Paramètres
     private void showGPSDisabledAlertToUser() {
+        mediaPlayer(error);
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this, AlertDialog.THEME_DEVICE_DEFAULT_DARK);
         alertDialogBuilder.setMessage(getString(R.string.gps_disabled))
                 .setCancelable(false)
@@ -243,6 +260,10 @@ public class NewMissionActivity extends AppCompatActivity implements LocationLis
             case R.id.save_mission:
                 createMission();
                 return true;
+            case android.R.id.home:
+                mediaPlayer(off);
+                finish();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -264,6 +285,7 @@ public class NewMissionActivity extends AppCompatActivity implements LocationLis
         if(verif_dateStart || verif_dateStop || title.trim().isEmpty() || start.trim().isEmpty() || start.trim().isEmpty()
                 || latitude.trim().isEmpty() || longitude.trim().isEmpty() || radius.trim().isEmpty()
                 || location.trim().isEmpty() || description.trim().isEmpty()){
+            mediaPlayer(error);
             Toast.makeText(this, getString(R.string.emptyField), Toast.LENGTH_SHORT).show();
             return;
         }
@@ -273,6 +295,7 @@ public class NewMissionActivity extends AppCompatActivity implements LocationLis
             Date date1 = sdf.parse(start);
             Date date2 = sdf.parse(stop);
             if(!(date1.compareTo(date2)<0)){
+                mediaPlayer(error);
                 Toast.makeText(this, getString(R.string.error_date), Toast.LENGTH_SHORT).show();
                 return;
 
@@ -297,12 +320,14 @@ public class NewMissionActivity extends AppCompatActivity implements LocationLis
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
+                        mediaPlayer(on);
                         Toast.makeText(NewMissionActivity.this,getString(R.string.creation_mission_send) , Toast.LENGTH_SHORT).show();
                         finish();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
+                mediaPlayer(error);
                 Toast.makeText(NewMissionActivity.this,getString(R.string.creation_mission_fail), Toast.LENGTH_SHORT).show();
                 Log.d(TAG, e.toString());
             }
@@ -324,6 +349,7 @@ public class NewMissionActivity extends AppCompatActivity implements LocationLis
 
             if(shake > 13){
                 if(!DIALOG_DELETE_DATA_ALREADY_RUN) {
+                    mediaPlayer(off);
                     AlertDialog.Builder alert = new AlertDialog.Builder(NewMissionActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_DARK)
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setTitle(getString(R.string.suppression))
@@ -368,6 +394,7 @@ public class NewMissionActivity extends AppCompatActivity implements LocationLis
     @Override
     public void onLocationChanged(Location location) {
         if(LOCALISATION_PRESSED){
+            mediaPlayer(on);
             editTextLatitude.setText(String.valueOf(location.getLatitude()));
             editTextLongitude.setText(String.valueOf(location.getLongitude()));
             LOCALISATION_PRESSED = false;
