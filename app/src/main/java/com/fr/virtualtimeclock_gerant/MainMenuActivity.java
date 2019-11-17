@@ -218,7 +218,7 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
     private void dispatchPictureTakerAction() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if(takePictureIntent.resolveActivity(getPackageManager()) != null){ // S'assurer qu'il y a une application caméra pour lancer l'Intent
-            //Création du fichier ou la photo va être save
+            //Création du fichier ou la photo va être sauvegarder
             photoFile = createPhotoFile();
             if(photoFile != null){
                 filepath = FileProvider.getUriForFile(MainMenuActivity.this,"com.fr.virtualtimeclock_gerant.fileprovider",photoFile);
