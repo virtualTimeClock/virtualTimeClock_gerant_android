@@ -29,6 +29,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -60,7 +62,8 @@ public class NewEmployeeActivity extends AppCompatActivity {
     private Button selectBirthday;
     private TextView textBirthday;
 
-    private FirebaseAuth mAuth;
+    private FirebaseAuth mAuth1;
+    private FirebaseAuth mAuth2;
 
     private String currentDate;
 
@@ -92,8 +95,20 @@ public class NewEmployeeActivity extends AppCompatActivity {
         selectBirthday = findViewById(R.id.btnBirthday);
         textBirthday = findViewById(R.id.textviewBirthday);
 
-        mAuth = FirebaseAuth.getInstance();
+        // Maintenir l'utilisateur connecté sans qu'il change de compte à cause de la
+        //      connexion automatique lors de la création d'une autre utilisateur
+        mAuth1 = FirebaseAuth.getInstance();
+        FirebaseOptions firebaseOptions = new FirebaseOptions.Builder()
+                .setDatabaseUrl("https://virtual-time-clock-d7449.firebaseio.com/")
+                .setApiKey("AIzaSyC0R8AIr8-6vgw3ODTjpjjppnFvbM7B4kM")
+                .setApplicationId("virtual-time-clock-d7449").build();
+        try { FirebaseApp myApp = FirebaseApp.initializeApp(getApplicationContext(), firebaseOptions, "AnyAppName");
+            mAuth2 = FirebaseAuth.getInstance(myApp);
+        } catch (IllegalStateException e){
+            mAuth2 = FirebaseAuth.getInstance(FirebaseApp.getInstance("AnyAppName"));
+        }
 
+        // Acceleromètre
         sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sm.registerListener(sensorListener, sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
         acelVal = SensorManager.GRAVITY_EARTH;
@@ -182,17 +197,28 @@ public class NewEmployeeActivity extends AppCompatActivity {
             }
         });
 
+        // envoi d'un email pour que l'employé puisse réinitialiser le mdp
+        mAuth1.sendPasswordResetEmail(email)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "Email sent.");
+                        }
+                    }
+                });
+
+        // Déconnexion de l'employé créé par l'utilisateur
         String password = generatPassword(8);
-        mAuth.createUserWithEmailAndPassword(email, password)
+        mAuth2.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
-                        // Sign in success, update UI with the signed-in user's information
-                        Log.d(TAG, "createUserWithEmail:success");
+                        Log.d(TAG, "createUserWithEmail : success");
+                        mAuth2.signOut();
                     } else {
-                        // If sign in fails, display a message to the user.
-                        Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                        Log.w(TAG, "createUserWithEmail : failure", task.getException());
                         Toast.makeText(NewEmployeeActivity.this, getString(R.string.creation_employee_mail_fail),  Toast.LENGTH_SHORT).show();
                     }
                 }
