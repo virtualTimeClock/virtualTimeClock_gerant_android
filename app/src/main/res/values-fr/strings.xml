@@ -43,5 +43,16 @@
     <string name="suppression_msg">Êtes-vous sûr de vouloir supprimer toutes les données saisies ?</string>
     <string name="suppression_data_cancel">Suppression annulée</string>
     <string name="suppression_data_success">Toutes les données ont été supprimées</string>
-    <string name="can_delete">Vous pouvez tout supprimer en secouer l\'appareil.</string>
+    <string name="can_delete">Vous pouvez tout supprimer en secouant l\'appareil.</string>
+    <string name="email">E-mail</string>
+    <string name="email_validation">Validation E-mail</string>
+    <string name="firstname">Prénom</string>
+    <string name="name">Nom</string>
+    <string name="textviewBirthday">"Née le : "</string>
+    <string name="creation_employee_fail">Erreur lors de l\'envoi</string>
+    <string name="creation_employee_send">Employé Créé</string>
+    <string name="addEmployee">Ajouter un employé</string>
+    <string name="email_different">Les emails que vous avez saisies ne sont pas les mêmes</string>
+    <string name="creation_employee_mail_fail">Echec de la création du compte</string>
+    <string name="error_birthday">La date de naissance doit être plus petite que la date actuelle</string>
 </resources>

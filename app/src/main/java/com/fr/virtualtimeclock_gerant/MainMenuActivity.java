@@ -64,7 +64,8 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
     private ImageView companyPicture;
 
     private HorizontalScrollMenuView menu;
-    private FloatingActionButton buttonAdNote;
+    private FloatingActionButton buttonAddMission;
+    private FloatingActionButton buttonAddEmployee;
 
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseUser currentUser =  mAuth.getCurrentUser();
@@ -72,16 +73,16 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
     private StorageReference storageReference;
     private FirebaseStorage storage;
 
-    private CollectionReference notebookRef = db.collection("missions");
+    private CollectionReference missionsRef = db.collection("missions");
+    private CollectionReference employeeRef = db.collection("utilisateurs");
 
-    private MissionAdapter adapter;
+    private MissionAdapter missionsAdapter;
+    private EmployeeAdapter employeeAdapter;
 
     private File photoFile;
     private Uri filepath;
 
     private String imgURL = "";
-
-    private Button test;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,10 +91,10 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
 
         menu = findViewById(R.id.menu);
         userEmail = findViewById(R.id.email);
-        buttonAdNote = findViewById(R.id.button_add_mission);
+        buttonAddMission = findViewById(R.id.button_add_mission);
+        buttonAddEmployee = findViewById(R.id.button_add_employee);
         buttonCapture = findViewById(R.id.upload);
         companyPicture = findViewById(R.id.imageView);
-        test = findViewById(R.id.testBtn);
 
         // Vérification des permissions pour la caméra et le stockage
         if(Build.VERSION.SDK_INT >= 23) requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_REQUEST_CODE);
@@ -101,14 +102,15 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
         storage  = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
-        buttonAdNote.setOnClickListener(this);
+        buttonAddMission.setOnClickListener(this);
         buttonCapture.setOnClickListener(this);
-        test.setOnClickListener(this);
+        buttonAddEmployee.setOnClickListener(this);
 
         userEmail.setText(currentUser.getEmail());
 
         initMenuBar();
-        setUpRecyclerView();
+        setUpRecyclerViewMissions();
+        setUpRecyclerViewEmployee();
         loadProfilePicture();
     }
 
@@ -130,9 +132,6 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
                 else if(menuItem.getText().equals("Logout"))mainMenu = "Logout";
                 switch(mainMenu){
                     case "Profile":
-                        Toast.makeText(MainMenuActivity.this, ""+menuItem.getText(),
-                                Toast.LENGTH_SHORT).show();
-
                         menu.setItemSelected(0);
                         menu.editItem(0,"Profile",R.drawable.ic_profile_selected,false,0);
                         menu.editItem(1,"Employee",R.drawable.ic_employee,false,0);
@@ -144,9 +143,6 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
                         break;
                     case "Employee":
                         menu.setItemSelected(1);
-                        Toast.makeText(MainMenuActivity.this, ""+menuItem.getText(),
-                                Toast.LENGTH_SHORT).show();
-
                         menu.editItem(0,"Profile",R.drawable.ic_profile,false,0);
                         menu.editItem(1,"Employee",R.drawable.ic_employee_selected,false,0);
                         menu.editItem(2,"Mission",R.drawable.ic_mission,false,0);
@@ -157,9 +153,6 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
                         break;
                     case "Mission":
                         menu.setItemSelected(2);
-                        Toast.makeText(MainMenuActivity.this, ""+menuItem.getText(),
-                                Toast.LENGTH_SHORT).show();
-
                         menu.editItem(0,"Profile",R.drawable.ic_profile,false,0);
                         menu.editItem(1,"Employee",R.drawable.ic_employee,false,0);
                         menu.editItem(2,"Mission",R.drawable.ic_mission_selected,false,0);
@@ -185,8 +178,8 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
             startActivity(new Intent(MainMenuActivity.this, NewMissionActivity.class));
         }else if(i == R.id.upload){
             dispatchPictureTakerAction();
-        }else if(i ==R.id.testBtn){
-            startActivity(new Intent(MainMenuActivity.this, ShootAndCropActivity.class));
+        }else if(i == R.id.button_add_employee){
+            startActivity(new Intent(MainMenuActivity.this, NewEmployeeActivity.class));
         }
     }
 
@@ -264,7 +257,7 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             progressDialog.dismiss();
                             Toast.makeText(MainMenuActivity.this, "Upload Successful!", Toast.LENGTH_SHORT).show();
-                            //loadProfilePicture();
+                            loadProfilePicture();
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -284,26 +277,69 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
 
     // ---------------------------------------------- Menu Employées : ---------------------------------- :
 
-    //TODO : LISTES DES EMPLOYEES + CREATION ET SUPPRESSION COMPTE
+    // Affichage des employés ordonnées par nom
+    // Suppression des employés avec des swipes latéraux
+    // Ouverture des détails des employés
+    private void setUpRecyclerViewEmployee() {
+        Query query = employeeRef.orderBy("nom", Query.Direction.ASCENDING);
+
+        FirestoreRecyclerOptions<Employee> options = new FirestoreRecyclerOptions.Builder<Employee>()
+                .setQuery(query, Employee.class)
+                .build();
+
+        employeeAdapter = new EmployeeAdapter(options);
+
+        RecyclerView recyclerView_employee = findViewById(R.id.recycler_view_employee);
+        recyclerView_employee.setHasFixedSize(true);
+        recyclerView_employee.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView_employee.setAdapter(employeeAdapter);
+
+        // Pour la suppression des employés on choisi de ne pas faire de drag and drop
+        //   et de faire supprimer les employés par la droite ou la gauche lors du glissement
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            //Pour du drag and drop (inutiliser dans notre cas)
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+            //Pour des mouvements de glissements
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                employeeAdapter.deleteItem(viewHolder.getAdapterPosition());
+            }
+        }).attachToRecyclerView(recyclerView_employee);
+
+        //Détecte le clic sur l'employée
+        employeeAdapter.setOnClickListener(new EmployeeAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
+                Employee employee = documentSnapshot.toObject(Employee.class);
+                String id = documentSnapshot.getId();
+                String path = documentSnapshot.getReference().getPath();
+                Toast.makeText(MainMenuActivity.this, "Position: " + position+ " ID: "+id, Toast.LENGTH_SHORT).show();
+                //startActivity(...);
+            }
+        });
+    }
 
     // ---------------------------------------------- Menu Missions : ----------------------------------- :
 
     // Affichage des missions ordonnées par date de début
     // Suppression des missions avec des swipes latéraux
     // Ouverture des missions
-    private void setUpRecyclerView() {
-        Query query = notebookRef.orderBy("debut", Query.Direction.ASCENDING);
+    private void setUpRecyclerViewMissions() {
+        Query query = missionsRef.orderBy("debut", Query.Direction.ASCENDING);
 
         FirestoreRecyclerOptions<Mission> options = new FirestoreRecyclerOptions.Builder<Mission>()
                 .setQuery(query, Mission.class)
                 .build();
 
-        adapter = new MissionAdapter(options);
+        missionsAdapter = new MissionAdapter(options);
 
-        RecyclerView recyclerView = findViewById(R.id.recycler_view);
+        RecyclerView recyclerView = findViewById(R.id.recycler_view_missions);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(adapter);
+        recyclerView.setAdapter(missionsAdapter);
 
         // Pour la suppression des mission on choisi de ne pas faire de drag and drop
         //   et de faire supprimer la mission par la droite ou la gauche lors du glissement
@@ -316,12 +352,12 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
             //Pour des mouvements de glissements
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                adapter.deleteItem(viewHolder.getAdapterPosition());
+                missionsAdapter.deleteItem(viewHolder.getAdapterPosition());
             }
         }).attachToRecyclerView(recyclerView);
 
         //Détecte le clic sur la mission
-        adapter.setOnClickListener(new MissionAdapter.OnItemClickListener() {
+        missionsAdapter.setOnClickListener(new MissionAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
                 Mission mission = documentSnapshot.toObject(Mission.class);
@@ -333,16 +369,20 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
         });
     }
 
+    // Début de l'écoute de la base de données
     @Override
     protected void onStart() {
         super.onStart();
-        adapter.startListening();
+        missionsAdapter.startListening();
+        employeeAdapter.startListening();
     }
 
+    // fin de l'écoute de la base de données
     @Override
     protected void onStop() {
         super.onStop();
-        adapter.stopListening();
+        missionsAdapter.stopListening();
+        employeeAdapter.stopListening();
     }
 
     // Récupération de la photo prise pour ensuite éxecuter la fonction startCrop
@@ -371,7 +411,7 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
 
         UCrop uCrop = UCrop.of(uri,Uri.fromFile(new File(getCacheDir(), destinationFileName)));
         uCrop.withAspectRatio(1,1);
-        uCrop.withMaxResultSize(200,200);
+        uCrop.withMaxResultSize(400,400);
         uCrop.withOptions(getCropOptions());
         uCrop.start(MainMenuActivity.this);
     }
@@ -380,7 +420,7 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
     private UCrop.Options getCropOptions(){
         UCrop.Options options = new UCrop.Options();
 
-        options.setCompressionQuality(70);
+        options.setCompressionQuality(100);
 
         //CompressType
         //options.setCompressionFormat(Bitmap.CompressFormat.PNG);

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/grey_100"
+    android:gravity="center_vertical"
+    tools:context=".NewEmployeeActivity">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:onClick="closeKeyboard">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/grey_100"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <EditText
+                android:id="@+id/edit_text_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/name"
+                android:inputType="text"
+                android:textColor="@color/colorWhite"
+                android:textColorHint="@color/grey_500" />
+
+            <EditText
+                android:id="@+id/edit_text_firstname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/firstname"
+                android:inputType="text"
+                android:textColor="@color/colorWhite"
+                android:textColorHint="@color/grey_500" />
+
+            <LinearLayout
+                android:id="@+id/linearLayoutBirthday"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingEnd="15dp"
+                tools:context=".MissionActivity">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/textviewBirthday"
+                    android:textColor="@android:color/white"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/textviewBirthday"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="13sp"
+                    android:layout_weight="1"
+                    android:text="@string/dateFormat"
+                    android:textColor="@color/grey_500" />
+
+                <Button
+                    android:id="@+id/btnBirthday"
+                    android:layout_width="30dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:textSize="12sp"
+                    android:background="@drawable/roundedbutton"
+                    android:drawableStart="@drawable/ic_calendar"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="@string/calend"
+                    android:textColor="@android:color/white" />
+
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/edit_text_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/email"
+                android:inputType="textEmailAddress"
+                android:textColor="@color/colorWhite"
+                android:textColorHint="@color/grey_500" />
+
+            <EditText
+                android:id="@+id/edit_text_email_verification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/email_validation"
+                android:inputType="textEmailAddress"
+                android:textColor="@color/colorWhite"
+                android:textColorHint="@color/grey_500" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textStyle="italic"
+                android:textSize="14sp"
+                android:text="@string/can_delete" />
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>

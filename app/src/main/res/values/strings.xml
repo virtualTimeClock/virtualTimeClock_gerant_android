@@ -44,4 +44,15 @@
     <string name="suppression_data_success">All data has been deleted</string>
     <string name="suppression_data_cancel">Delete canceled</string>
     <string name="can_delete">You can delete everything by shaking the device.</string>
+    <string name="name">Name</string>
+    <string name="firstname">Firstname</string>
+    <string name="textviewBirthday">"Birthday : "</string>
+    <string name="email">E-mail</string>
+    <string name="email_validation">E-mail Validation</string>
+    <string name="creation_employee_send">Employee Created</string>
+    <string name="creation_employee_fail">Error Send</string>
+    <string name="addEmployee">Add Employee</string>
+    <string name="email_different">The emails you have entered are not the same</string>
+    <string name="creation_employee_mail_fail">Account Creation failed</string>
+    <string name="error_birthday">The birthday must be smallet than the current date</string>
 </resources>

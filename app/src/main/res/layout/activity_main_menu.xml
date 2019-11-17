@@ -83,19 +83,26 @@
         android:visibility="gone"
         android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/txtEmploy"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="les employées"
-            android:textSize="30sp"/>
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <Button
-            android:id="@+id/testBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="test"/>
+            <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_employee"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/button_add_employee"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:backgroundTint="@color/colorOrangeMenu"
+                android:layout_margin="16dp"
+                android:src="@drawable/ic_add"/>
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
     </LinearLayout>
 
     <!-- - - - - - - - LAYOUT DES MISSIONS - - - - - - - -->
@@ -113,7 +120,7 @@
             android:layout_height="match_parent">
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_view"
+                android:id="@+id/recycler_view_missions"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
 

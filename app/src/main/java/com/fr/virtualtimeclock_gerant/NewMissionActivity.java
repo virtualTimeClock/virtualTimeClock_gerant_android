@@ -50,7 +50,7 @@ import java.util.Map;
 
 public class NewMissionActivity extends AppCompatActivity implements LocationListener {
 
-    private static final String TAG = "MissionActivity";
+    private static final String TAG = "NewMissionActivity";
 
     private static final String KEY_TITLE = "titre";
     private static final String KEY_DATE_START = "debut";
@@ -258,9 +258,10 @@ public class NewMissionActivity extends AppCompatActivity implements LocationLis
         String location = editTextLocalisation.getText().toString();
         String description = editTextDescription.getText().toString();
 
-
         // Demande à saisir tous les champs avant d'envoyer
-        if(title.trim().isEmpty() || start.trim().isEmpty() || start.trim().isEmpty()
+        boolean verif_dateStart = getString(R.string.dateFormat).equals(start);
+        boolean verif_dateStop = getString(R.string.dateFormat).equals(stop);
+        if(verif_dateStart || verif_dateStop || title.trim().isEmpty() || start.trim().isEmpty() || start.trim().isEmpty()
                 || latitude.trim().isEmpty() || longitude.trim().isEmpty() || radius.trim().isEmpty()
                 || location.trim().isEmpty() || description.trim().isEmpty()){
             Toast.makeText(this, getString(R.string.emptyField), Toast.LENGTH_SHORT).show();
@@ -323,7 +324,7 @@ public class NewMissionActivity extends AppCompatActivity implements LocationLis
 
             if(shake > 13){
                 if(!DIALOG_DELETE_DATA_ALREADY_RUN) {
-                    new AlertDialog.Builder(NewMissionActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_DARK)
+                    AlertDialog.Builder alert = new AlertDialog.Builder(NewMissionActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_DARK)
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setTitle(getString(R.string.suppression))
                         .setMessage(getString(R.string.suppression_msg))
@@ -348,7 +349,13 @@ public class NewMissionActivity extends AppCompatActivity implements LocationLis
                                 DIALOG_DELETE_DATA_ALREADY_RUN = false;
                                 Toast.makeText(getApplicationContext(),getString(R.string.suppression_data_cancel),Toast.LENGTH_LONG).show();
                             }
-                        }).show();
+                        });
+                    AlertDialog alerts = alert.create();
+                    try {       // try/catch ajouter sinon crash quand on quitte l'activité
+                        alerts.show();
+                    } catch (WindowManager.BadTokenException e) {
+                        Log.d(TAG, "onSensorChanged: ", e);
+                    }
                 }
                 DIALOG_DELETE_DATA_ALREADY_RUN = true;
             }

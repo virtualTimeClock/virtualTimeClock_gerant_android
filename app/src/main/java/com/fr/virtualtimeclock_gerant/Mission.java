@@ -21,21 +21,9 @@ public class Mission {
         this.fin = fin;
     }
 
-    public String getTitre() {
-        return titre;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getLieu() {
-        return lieu;
-    }
-    public Date getDebut() {
-        return debut;
-    }
-    public Date getFin() {
-        return fin;
-    }
+    public String getTitre() { return titre; }
+    public String getDescription() { return description; }
+    public String getLieu() { return lieu; }
+    public Date getDebut() { return debut; }
+    public Date getFin() { return fin; }
 }
