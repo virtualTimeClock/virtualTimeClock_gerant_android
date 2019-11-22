@@ -52,7 +52,7 @@ import java.util.Date;
 import java.util.Locale;
 
 
-public class MainMenuActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainMenuActivity extends BaseActivity implements View.OnClickListener {
 
 
     private static final int CAMERA_REQUEST_CODE = 1;
@@ -124,10 +124,7 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
         loadProfilePicture();
     }
 
-    //Jouer un son
-    public void mediaPlayer(MediaPlayer m) {
-        m.start();
-    }
+
 
     // Création du menu avec toutes les onglets contenant les images et lors du clic sur un onglet
     //     il affiche le layout qui lui correspond en masquant les autres
@@ -432,7 +429,7 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
 
     // Début de l'écoute de la base de données
     @Override
-    protected void onStart() {
+    public void onStart() {
         super.onStart();
         missionsAdapter.startListening();
         employeeAdapter.startListening();
@@ -440,7 +437,7 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
 
     // fin de l'écoute de la base de données
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
         missionsAdapter.stopListening();
         employeeAdapter.stopListening();

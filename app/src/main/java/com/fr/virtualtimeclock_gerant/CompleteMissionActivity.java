@@ -28,7 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class CompleteMissionActivity extends AppCompatActivity implements View.OnClickListener {
+public class CompleteMissionActivity extends BaseActivity implements View.OnClickListener {
 
     private static final String TAG = "CompleteMissionActivity";
 
@@ -153,8 +153,4 @@ public class CompleteMissionActivity extends AppCompatActivity implements View.O
         return super.onOptionsItemSelected(item);
     }
 
-    //Jouer un son
-    public void mediaPlayer(MediaPlayer m) {
-        m.start();
-    }
 }

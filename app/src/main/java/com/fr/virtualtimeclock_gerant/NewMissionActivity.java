@@ -49,7 +49,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class NewMissionActivity extends AppCompatActivity implements LocationListener {
+public class NewMissionActivity extends BaseActivity implements LocationListener {
 
     private static final String TAG = "NewMissionActivity";
 
@@ -207,11 +207,6 @@ public class NewMissionActivity extends AppCompatActivity implements LocationLis
         });
     }
 
-    //Jouer un son
-    public void mediaPlayer(MediaPlayer m) {
-        m.start();
-    }
-
     // Boitede dialogue qui propose l'activation du GPS en allant dans les Paramètres
     private void showGPSDisabledAlertToUser() {
         mediaPlayer(error);
@@ -238,12 +233,6 @@ public class NewMissionActivity extends AppCompatActivity implements LocationLis
         }
 
     }
-
-    //Masque le clavier en cliquant ailleurs sur l'écran
-    public void closeKeyboard(View v) {
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-}
 
     // Menu qui contient le bouton pour quitter et sauvegarder
     @Override

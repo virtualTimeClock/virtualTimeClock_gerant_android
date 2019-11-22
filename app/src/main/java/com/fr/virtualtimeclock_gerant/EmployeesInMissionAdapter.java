@@ -5,6 +5,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,10 +21,13 @@ public class EmployeesInMissionAdapter extends RecyclerView.Adapter<EmployeesInM
 
     EmployeesInMissionActivity employeesInMissionActivity;
     ArrayList<CompleteEmployeeInMission> userArrayList;
+    String missionRef, pointageId;
     Boolean imgInZone;
 
-    public EmployeesInMissionAdapter(EmployeesInMissionActivity mainActivity, ArrayList<CompleteEmployeeInMission> userArrayList) {
+    public EmployeesInMissionAdapter(EmployeesInMissionActivity mainActivity, ArrayList<CompleteEmployeeInMission> userArrayList, String missionRef, String pointageId) {
         this.employeesInMissionActivity = mainActivity;
+        this.missionRef = missionRef;
+        this.pointageId = pointageId;
         this.userArrayList = userArrayList;
     }
 
@@ -40,26 +47,50 @@ public class EmployeesInMissionAdapter extends RecyclerView.Adapter<EmployeesInM
         holder.mNom_EiM.setText(userArrayList.get(position).getNom());
         holder.mPrenom_EiM.setText(userArrayList.get(position).getPrenom());
         holder.mEstPresent_EiM.setText(String.valueOf(userArrayList.get(position).getEstPresent()));
+        if(userArrayList.get(position).getDate() != null) {
+            holder.mDate_EiM.setText(new SimpleDateFormat("EEE, dd-MM-yy  HH:mm aaa", Locale.getDefault()).format(userArrayList.get(position).getDate()));
+        }
 //        holder.mDeleteRowBtn_EiM.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
 //                deleteSelectedRow(position);
 //            }
 //        });
-        if(userArrayList.get(position).getEstPresent()){
-            holder.mDeleteRowBtn_EiM.setBackgroundResource(R.drawable.ic_in_zone);
-            imgInZone = true;
-        }else{
-            holder.mDeleteRowBtn_EiM.setBackgroundResource(R.drawable.ic_out_zone);
-            imgInZone = false;
+        if(userArrayList.get(position).getEstPresent() != null) {
+            if (userArrayList.get(position).getEstPresent()) {
+                holder.mDeleteRowBtn_EiM.setBackgroundResource(R.drawable.ic_in_zone);
+                imgInZone = true;
+            } else if(!userArrayList.get(position).getEstPresent()) {
+                holder.mDeleteRowBtn_EiM.setBackgroundResource(R.drawable.ic_out_zone);
+                imgInZone = false;
+            }
         }
-        holder.mDate_EiM.setText(new SimpleDateFormat("EEE, dd-MM-yy  HH:mm aaa", Locale.getDefault()).format(userArrayList.get(position).getDate()));
+        if(pointageId != null){
+            deleteSelectedRow(pointageId);
+        }
     }
-//
-//    private void deleteSelectedRow(int position) {
-//        employeesInMissionActivity.db.collection("pointage").document("PUr56wkTxjT7pFSyGiPO").collection("pointageMission")
-//                .document("mp0t5o1wp67A20D9edfW")
-//    }
+
+    private void deleteSelectedRow(String position) {
+        employeesInMissionActivity.showProgressDialog();
+        employeesInMissionActivity.db.collection("pointage").document(missionRef).collection("pointageMission")
+                .document(position)
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        employeesInMissionActivity.hideProgressDialog();
+                        Toast.makeText(employeesInMissionActivity.getBaseContext(), "Employé supprimé : success",  Toast.LENGTH_SHORT).show();
+                        userArrayList.clear();
+                        employeesInMissionActivity.loadDataFromFirebase();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(employeesInMissionActivity.getBaseContext(), "Employé supprimé : fail",  Toast.LENGTH_SHORT).show();
+
+                    }
+                });
+    }
 
 
     @Override

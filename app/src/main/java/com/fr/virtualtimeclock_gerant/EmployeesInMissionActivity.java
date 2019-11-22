@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 
-public class EmployeesInMissionActivity extends AppCompatActivity {
+public class EmployeesInMissionActivity extends BaseActivity {
 
     private static final String TAG = "EmployeeAndMission";
     FirebaseFirestore db;
@@ -46,7 +46,8 @@ public class EmployeesInMissionActivity extends AppCompatActivity {
     EmployeesInMissionAdapter adapter;
     Button updateButton;
 
-    Boolean employeeExist = true;
+    String missionRef;
+    String pointageId;
 
     MediaPlayer off;
     MediaPlayer on;
@@ -78,6 +79,7 @@ public class EmployeesInMissionActivity extends AppCompatActivity {
         if(b!=null){
             String docRef = (String) b.get("DOCUMENT_PATH");
             employeeInMissionRef = db.collection("pointage").document(docRef).collection("pointageMission");
+            missionRef = docRef;
         }
 
         loadDataFromFirebase();
@@ -103,13 +105,13 @@ public class EmployeesInMissionActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mediaPlayer(on);
-                completeEmployeeInMissionArrayList.clear();     //vider la liste pour éviter des duplication lors de l'actualisation des données
+                //pointageId= null;
                 loadDataFromFirebase();
             }
         });
     }
 
-    private void loadDataFromFirebase() {
+    public void loadDataFromFirebase() {
         final int[] tour = {0};
         employeeInMissionRef
             .get()
@@ -117,11 +119,12 @@ public class EmployeesInMissionActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                     if (task.isSuccessful()) {
-                        //employeeInMissionArrayList.clear();     //vider la liste pour éviter des duplication lors de l'actualisation des données
+                        completeEmployeeInMissionArrayList.clear();     //vider la liste pour éviter des duplication lors de l'actualisation des données
+                        showProgressDialog();
                         for (final QueryDocumentSnapshot document : task.getResult()) {
                             tour[0] = tour[0] +1;
                             System.out.println("ICI , Tour : "+(tour[0]));
-
+                            pointageId= null;
 
                             //-----------------------------------------------------------------------------------------------------------------
                             DocumentReference employeeRef = db.collection("utilisateurs").document(document.getId());
@@ -137,9 +140,6 @@ public class EmployeesInMissionActivity extends AppCompatActivity {
                                     DocumentSnapshot doc = task.getResult();
                                     if (doc.exists()) {
                                         Log.d(TAG, "l'employé existe");
-                                        employeeExist = true;
-
-                                        Log.d(TAG, "DocumentSnapshot data: " + doc.getData());
                                         Log.d("EMPLOYEE", doc.getId() + " => " + doc.getData());
 
                                         employee.setNom(doc.getString("nom"));
@@ -150,9 +150,11 @@ public class EmployeesInMissionActivity extends AppCompatActivity {
                                         finalCeim.setEstPresent(document.getBoolean("estPresent"));
                                     } else {
                                         Log.d(TAG, "l'employé n'exite plus");
-                                        employeeExist = false;
-                                        finalCeim.setNom("nom");
-                                        finalCeim.setPrenom("prenom");
+                                        Log.d("EMPLOYEE", doc.getId() + " => " + doc.getData());
+
+                                        pointageId = doc.getId();
+
+                                        finalCeim.setNom(getString(R.string.user_deleted));
                                         finalCeim.setDate(new Date());
                                         finalCeim.setEstPresent(false);
                                     }
@@ -160,38 +162,33 @@ public class EmployeesInMissionActivity extends AppCompatActivity {
                             }).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                 @Override
                                 public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                    hideProgressDialog();
                                     Log.d(TAG, "Employee Add in mission : success");
-                                    if(employeeExist){
-                                        adapter = new EmployeesInMissionAdapter(EmployeesInMissionActivity.this, completeEmployeeInMissionArrayList);
+                                    Log.d(TAG, "missionRef avant envoi : "+missionRef);
+                                    Log.d(TAG, "pointageId avant envoi : "+pointageId);
+                                        adapter = new EmployeesInMissionAdapter(EmployeesInMissionActivity.this, completeEmployeeInMissionArrayList, missionRef, pointageId );
                                         mRecyclerView.setAdapter(adapter);
-                                    }
                                 }
                             });
                             //---------------------------------------------------------------------------------------------------------------------
 
-                            System.out.print("ICI , nom : "); System.out.println(document.getString("nom"));
-                            System.out.print("ICI , prenom : "); System.out.println(document.getString("prenom"));
-                            System.out.print("ICI , emp nom : "); System.out.println(employee.getNom());
-                            System.out.print("ICI , emp prenom : ");  System.out.println(employee.getPrenom());
+//                            System.out.print("ICI , nom : "); System.out.println(document.getString("nom"));
+//                            System.out.print("ICI , prenom : "); System.out.println(document.getString("prenom"));
+//                            System.out.print("ICI , emp nom : "); System.out.println(employee.getNom());
+//                            System.out.print("ICI , emp prenom : ");  System.out.println(employee.getPrenom());
 
                             Log.d("TAG", document.getId() + " => " + document.getData());
 
 
                             completeEmployeeInMissionArrayList.add(ceim);
-
                             System.out.print("ICI , completeEmployeeInMissionActivity : "); System.out.println(completeEmployeeInMissionArrayList);
+
                         }
                     } else {
                         Log.d("TAG", "Error getting employee in missions documents: ", task.getException());
                     }
                 }
             });
-    }
-
-
-    //Jouer un son
-    public void mediaPlayer(MediaPlayer m) {
-        m.start();
     }
 
 }

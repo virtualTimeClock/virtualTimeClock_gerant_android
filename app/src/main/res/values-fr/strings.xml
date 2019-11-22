@@ -66,4 +66,5 @@
     <string name="employee_in_this_mission">Employés dans cette mission</string>
     <string name="showEmployeeInMission">Employé sur cette mission</string>
     <string name="creation_employee_email_fail">Le format de l\'email est incorrect</string>
+    <string name="user_deleted">Utilisateur supprimé</string>
 </resources>

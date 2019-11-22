@@ -45,7 +45,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
-public class NewEmployeeActivity extends AppCompatActivity {
+public class NewEmployeeActivity extends BaseActivity {
 
     private static final String TAG = "NewEmployeeActivity";
     private boolean DIALOG_DELETE_DATA_ALREADY_RUN = false;
@@ -148,11 +148,6 @@ public class NewEmployeeActivity extends AppCompatActivity {
         });
     }
 
-    //Jouer un son
-    public void mediaPlayer(MediaPlayer m) {
-        m.start();
-    }
-
     // Fonction qui crée et envoie les données saisitent sur la base de données
     public void createEmployee() {
         String name = editTextName.getText().toString();
@@ -210,7 +205,8 @@ public class NewEmployeeActivity extends AppCompatActivity {
                     public void onSuccess(AuthResult authResult) {
                         Log.d(TAG, "createUserWithEmail : success");
 
-                        db.collection("utilisateurs").document(mAuth2.getUid()).set(employee)
+                        db.collection("utilisateurs").document(mAuth2.getUid())
+                                .set(employee)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
@@ -336,9 +332,4 @@ public class NewEmployeeActivity extends AppCompatActivity {
         public void onAccuracyChanged(Sensor sensor, int accuracy) { /*Pas utilisé*/ }
     };
 
-    //Masque le clavier en cliquant ailleurs sur l'écran
-    public void closeKeyboard(View v) {
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-    }
 }

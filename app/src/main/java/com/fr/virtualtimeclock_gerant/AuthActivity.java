@@ -56,17 +56,6 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
         db = FirebaseFirestore.getInstance();
     }
 
-    //Jouer un son
-    public void mediaPlayer(MediaPlayer m) {
-        m.start();
-    }
-
-    //Masque le clavier en cliquant ailleurs sur l'écran
-    public void closeKeyboard(View v) {
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-    }
-
     //Fonction exécuter lors de la connexion de l'utilisateur
     private void signIn(String email, String password) {
         Log.d(TAG, "sign In: " + email);
@@ -133,7 +122,7 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
         });
     }
 
-
+    // fonction qui exécute une boite de dialogue qui notifie le message en paramètre
     public void FailLogInAlertDialog(String errorMsg){
         mediaPlayer(error);
         new AlertDialog.Builder(this, AlertDialog.THEME_DEVICE_DEFAULT_DARK)

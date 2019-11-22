@@ -15,7 +15,7 @@ public class StartingActivity extends AppCompatActivity {
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);   // | retire la barre de notification android pour que le jeu soit en plein écran
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_starting);
-        //Timer qui a bout de 2s lance l'activité de l'écran d'acceuil
+        //Timer qui a bout de 1s lance l'activité de l'écran d'acceuil
         Thread thread = new Thread()
         {
             @Override

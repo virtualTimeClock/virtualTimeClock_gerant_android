@@ -20,6 +20,7 @@ public class CompleteEmployeeInMission {
         this.estPresent = estPresent;
     }
 
+
     public void setNom(String nom) { this.nom = nom; }
     public void setPrenom(String prenom) { this.prenom = prenom; }
     public void setDate(Date date) { this.date = date; }
