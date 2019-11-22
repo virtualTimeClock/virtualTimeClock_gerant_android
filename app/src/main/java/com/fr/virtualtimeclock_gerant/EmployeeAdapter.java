@@ -10,6 +10,7 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,7 +27,7 @@ public class EmployeeAdapter extends FirestoreRecyclerAdapter<Employee, Employee
     protected void onBindViewHolder(@NonNull NoteHolder holder, int position, @NonNull Employee model) {
         holder.textViewNom.setText(model.getNom());
         holder.textViewPrenom.setText(model.getPrenom());
-        holder.textViewDateNaissance.setText(new SimpleDateFormat("dd/MM/yyyy").format(model.getDateNaissance()));
+        holder.textViewDateNaissance.setText(new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(model.getDateNaissance()));
     }
 
     @NonNull

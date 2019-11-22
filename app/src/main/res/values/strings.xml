@@ -63,5 +63,8 @@
     <string name="longitudeFormat">"Longitude : "</string>
     <string name="rayonFormat">"Radius : "</string>
     <string name="descriptionFormat">"Description : "</string>
-    <string name="app">Virtual Time Clock</string>
+    <string name="app" translatable="false">Virtual Time Clock</string>
+    <string name="employee_in_this_mission">Employees in this mission</string>
+    <string name="showEmployeeInMission">Employee on this mission</string>
+    <string name="creation_employee_email_fail">The email format is incorrect</string>
 </resources>

@@ -6,9 +6,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,10 +22,13 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.ServerTimestamp;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
-public class CompleteMissionActivity extends AppCompatActivity {
+public class CompleteMissionActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "CompleteMissionActivity";
 
@@ -43,6 +48,8 @@ public class CompleteMissionActivity extends AppCompatActivity {
     private TextView txtLongitude;
     private TextView txtRayon;
     private TextView txtDescription;
+
+    private Button btnEmployeeMissionBtn;
 
     MediaPlayer off;
 
@@ -69,6 +76,10 @@ public class CompleteMissionActivity extends AppCompatActivity {
         txtRayon = findViewById(R.id.rayon);
         txtDescription = findViewById(R.id.description);
 
+        btnEmployeeMissionBtn = findViewById(R.id.employeeMissionBtn);
+
+        btnEmployeeMissionBtn.setOnClickListener(this);
+
         off = MediaPlayer.create(this, R.raw.sound_off);
 
         //récupération du chemin du document concerné envoyer par putExtra() depuis le MainMenuActivity
@@ -89,7 +100,7 @@ public class CompleteMissionActivity extends AppCompatActivity {
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         if (documentSnapshot.exists()) {
                             String titre = documentSnapshot.getString(KEY_TITRE);
-                            Date debut = documentSnapshot.getDate(KEY_DEBUT);
+                            Date debut = documentSnapshot.getDate(KEY_DEBUT, DocumentSnapshot.ServerTimestampBehavior.ESTIMATE);
                             Date fin = documentSnapshot.getDate(KEY_FIN);
                             String lieu = documentSnapshot.getString(KEY_LIEU);
                             GeoPoint localisation = documentSnapshot.getGeoPoint(KEY_LOCALISATION);
@@ -97,8 +108,8 @@ public class CompleteMissionActivity extends AppCompatActivity {
                             String description = documentSnapshot.getString(KEY_DESCRIPTION);
 
                             txtTitre.setText(titre);
-                            txtDebut.setText(""+debut);
-                            txtFin.setText(""+fin);
+                            txtDebut.setText(new SimpleDateFormat("EEE, dd-MM-yy  HH:mm aaa", Locale.getDefault()).format(debut));
+                            txtFin.setText(new SimpleDateFormat("EEE, dd-MM-yy  HH:mm aaa", Locale.getDefault()).format(fin));
                             txtLieu.setText(lieu);
                             txtLatitude.setText(""+localisation.getLatitude());
                             txtLongitude.setText(""+localisation.getLongitude());
@@ -115,6 +126,19 @@ public class CompleteMissionActivity extends AppCompatActivity {
                         Log.d(TAG, e.toString());
                     }
                 });
+    }
+
+    // Fonction qui identifie sur quel bouton l'utilisateur a cliqué
+    @Override
+    public void onClick(View v) {
+        int i = v.getId();
+        if(i == R.id.employeeMissionBtn){
+            String path = noteRef.getId();
+            //System.out.println(noteRef.collection(path).document().getId());
+            Intent startEmployeeInMissionActivity = new Intent(CompleteMissionActivity.this, EmployeesInMissionActivity.class);
+            startEmployeeInMissionActivity.putExtra("DOCUMENT_PATH", path);
+            startActivity(startEmployeeInMissionActivity);
+        }
     }
 
     // Fermeture de l'activité quand on clic sur la croix

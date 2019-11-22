@@ -10,6 +10,7 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,8 +28,8 @@ public class MissionAdapter extends FirestoreRecyclerAdapter<Mission, MissionAda
         holder.textViewTitle.setText(model.getTitre());
         holder.textViewDescription.setText(model.getDescription());
         holder.textViewLocation.setText(model.getLieu());
-        holder.textViewDebut.setText(new SimpleDateFormat("EEE, dd-MM-yy  HH:mm aaa").format(model.getDebut()));
-        holder.textViewFin.setText(new SimpleDateFormat("EEE, dd-MM-yy  HH:mm aaa").format(model.getFin()));
+        holder.textViewDebut.setText(new SimpleDateFormat("EEE, dd-MM-yy  HH:mm aaa", Locale.getDefault()).format(model.getDebut()));
+        holder.textViewFin.setText(new SimpleDateFormat("EEE, dd-MM-yy  HH:mm aaa", Locale.getDefault()).format(model.getFin()));
     }
 
     @NonNull

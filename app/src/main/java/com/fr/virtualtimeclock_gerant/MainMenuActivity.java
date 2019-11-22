@@ -49,6 +49,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 
 public class MainMenuActivity extends AppCompatActivity implements View.OnClickListener {
@@ -251,7 +252,7 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
     // Création de la photos au format jpg avec comme nom la date ou la photo a été prise
     // Sauvegarde des photos dans le répertoire cache de l'application
     private File createPhotoFile(){
-        String name = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String name = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String imageFileName = "JPEG_"+ name +"_VTC_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = null;
@@ -280,19 +281,73 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
                             loadProfilePicture();
                         }
                     }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    progressDialog.dismiss();
-                    Toast.makeText(MainMenuActivity.this, "Upload Failed!", Toast.LENGTH_SHORT).show();
-                }
-            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
-                    double progress = (100.0*taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-                    progressDialog.setMessage("Uploaded " + (int) progress + "%");
-                }
-            });
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            progressDialog.dismiss();
+                            Toast.makeText(MainMenuActivity.this, "Upload Failed!", Toast.LENGTH_SHORT).show();
+                        }
+                    }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+                            double progress = (100.0*taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                            progressDialog.setMessage("Uploaded " + (int) progress + "%");
+                        }
+                    });
         }
+    }
+
+    // Récupération de la photo prise pour ensuite éxecuter la fonction startCrop
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == RESULT_OK  && requestCode == CAMERA_REQUEST_CODE ) {
+
+            if (data != null) {
+                filepath = data.getData();
+            }
+            startCrop(filepath);
+        }else {
+            Uri filepathCrop = null;
+            if (data != null) {
+                filepathCrop = UCrop.getOutput(data);
+            }
+            uploadImage(filepathCrop);
+        }
+    }
+
+    // Fonction qui redimensionne la photo au format du cadre de la photo de profil
+    private void startCrop(@NonNull Uri uri){
+        String destinationFileName = SAMPLE_CROPPED_IMG_NAME;
+        destinationFileName +=".jpg";
+
+        UCrop uCrop = UCrop.of(uri,Uri.fromFile(new File(getCacheDir(), destinationFileName)));
+        uCrop.withAspectRatio(1,1);
+        uCrop.withMaxResultSize(400,400);
+        uCrop.withOptions(getCropOptions());
+        uCrop.start(MainMenuActivity.this);
+    }
+
+    // Option nécessaire au redimensionnement
+    private UCrop.Options getCropOptions(){
+        UCrop.Options options = new UCrop.Options();
+
+        options.setCompressionQuality(100);
+
+        //CompressType
+        //options.setCompressionFormat(Bitmap.CompressFormat.PNG);
+        //options.setCompressionFormat(Bitmap.CompressFormat.JPEG);
+
+        //UI
+        options.setHideBottomControls(false);
+        options.setFreeStyleCropEnabled(false);
+
+        //Colors
+        options.setStatusBarColor(getResources().getColor(R.color.colorOrangeButton));
+        options.setToolbarColor(getResources().getColor(R.color.colorOrangeButton));
+
+        options.setToolbarTitle("Crop Image");
+
+        return options;
     }
 
     // ---------------------------------------------- Menu Employées : ---------------------------------- :
@@ -389,60 +444,6 @@ public class MainMenuActivity extends AppCompatActivity implements View.OnClickL
         super.onStop();
         missionsAdapter.stopListening();
         employeeAdapter.stopListening();
-    }
-
-    // Récupération de la photo prise pour ensuite éxecuter la fonction startCrop
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_OK  && requestCode == CAMERA_REQUEST_CODE ) {
-
-            if (data != null) {
-                filepath = data.getData();
-            }
-            startCrop(filepath);
-        }else {
-            Uri filepathCrop = null;
-            if (data != null) {
-                filepathCrop = UCrop.getOutput(data);
-            }
-            uploadImage(filepathCrop);
-        }
-    }
-
-    // Fonction qui redimensionne la photo au format du cadre de la photo de profil
-    private void startCrop(@NonNull Uri uri){
-        String destinationFileName = SAMPLE_CROPPED_IMG_NAME;
-        destinationFileName +=".jpg";
-
-        UCrop uCrop = UCrop.of(uri,Uri.fromFile(new File(getCacheDir(), destinationFileName)));
-        uCrop.withAspectRatio(1,1);
-        uCrop.withMaxResultSize(400,400);
-        uCrop.withOptions(getCropOptions());
-        uCrop.start(MainMenuActivity.this);
-    }
-
-    // Option nécessaire au redimensionnement
-    private UCrop.Options getCropOptions(){
-        UCrop.Options options = new UCrop.Options();
-
-        options.setCompressionQuality(100);
-
-        //CompressType
-        //options.setCompressionFormat(Bitmap.CompressFormat.PNG);
-        //options.setCompressionFormat(Bitmap.CompressFormat.JPEG);
-
-        //UI
-        options.setHideBottomControls(false);
-        options.setFreeStyleCropEnabled(false);
-
-        //Colors
-        options.setStatusBarColor(getResources().getColor(R.color.colorOrangeButton));
-        options.setToolbarColor(getResources().getColor(R.color.colorOrangeButton));
-
-        options.setToolbarTitle("Crop Image");
-
-        return options;
     }
 
     // ---------------------------------------------- Menu Déconnexion : --------------------------------- :

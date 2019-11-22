@@ -103,6 +103,8 @@ public class NewEmployeeActivity extends AppCompatActivity {
         on = MediaPlayer.create(this, R.raw.sound_on);
         off = MediaPlayer.create(this, R.raw.sound_off);
         error = MediaPlayer.create(this, R.raw.error_sound);
+        off.setVolume(0.1f,0.1f);
+
 
         // Maintenir l'utilisateur connecté sans qu'il change de compte à cause de la
         //      connexion automatique lors de la création d'une autre utilisateur
@@ -158,7 +160,7 @@ public class NewEmployeeActivity extends AppCompatActivity {
         String birthday = textBirthday.getText().toString();
         String leader = "false";
 
-        String email  = editTextEmail.getText().toString();
+        final String email  = editTextEmail.getText().toString();
         String email_verif = editTextEmailVerif.getText().toString();
 
         // Demande à saisir tous les champs avant d'envoyer
@@ -172,7 +174,7 @@ public class NewEmployeeActivity extends AppCompatActivity {
 
         // Vérifie si la date de naissance est plus petite que la date actuelle
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
+            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
             Date birth = sdf.parse(birthday);
             Date current = sdf.parse(currentDate);
             if(!(birth.compareTo(current)<0)){
@@ -194,55 +196,55 @@ public class NewEmployeeActivity extends AppCompatActivity {
 
         // Map qui contient les clés (nom des clés dans la base de données) et les valeurs(valeurs des clés)
         //    à qu'on ajoute chaque donnée qui ont été saisie avant d'être envoyés
-        Map<String, Object> employee = new HashMap<>();
+        final Map<String, Object> employee = new HashMap<>();
         employee.put(KEY_NAME, name);
         employee.put(KEY_FIRSTNAME, firstname);
         employee.put(KEY_LEADER, Boolean.valueOf(leader));
         employee.put(KEY_BIRTHDAY, new Timestamp(new Date(birthday)));
 
-        db.collection("utilisateurs").document().set(employee)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+        // Déconnexion de l'employé créé par l'utilisateur
+        String password = generatPassword(8);
+        mAuth2.createUserWithEmailAndPassword(email, password)
+                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                     @Override
-                    public void onSuccess(Void aVoid) {
-                        mediaPlayer(on);
-                        Toast.makeText(NewEmployeeActivity.this,getString(R.string.creation_employee_send) , Toast.LENGTH_SHORT).show();
-                        finish();
+                    public void onSuccess(AuthResult authResult) {
+                        Log.d(TAG, "createUserWithEmail : success");
+
+                        db.collection("utilisateurs").document(mAuth2.getUid()).set(employee)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        mediaPlayer(on);
+                                        Toast.makeText(NewEmployeeActivity.this,getString(R.string.creation_employee_send) , Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                mediaPlayer(error);
+                                Toast.makeText(NewEmployeeActivity.this,getString(R.string.creation_employee_fail), Toast.LENGTH_SHORT).show();
+                                Log.d(TAG, e.toString());
+                            }
+                        });
+
+                        // envoi d'un email pour que l'employé puisse réinitialiser le mdp
+                        mAuth2.sendPasswordResetEmail(email)
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            Log.d(TAG, "Email sent.");
+                                        }
+                                    }
+                                });
+                        mAuth2.signOut();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                mediaPlayer(error);
-                Toast.makeText(NewEmployeeActivity.this,getString(R.string.creation_employee_fail), Toast.LENGTH_SHORT).show();
-                Log.d(TAG, e.toString());
+                Toast.makeText(NewEmployeeActivity.this,getString(R.string.creation_employee_email_fail), Toast.LENGTH_SHORT).show();
             }
         });
-
-        // envoi d'un email pour que l'employé puisse réinitialiser le mdp
-        mAuth1.sendPasswordResetEmail(email)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "Email sent.");
-                        }
-                    }
-                });
-
-        // Déconnexion de l'employé créé par l'utilisateur
-        String password = generatPassword(8);
-        mAuth2.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if (task.isSuccessful()) {
-                        Log.d(TAG, "createUserWithEmail : success");
-                        mAuth2.signOut();
-                    } else {
-                        Log.w(TAG, "createUserWithEmail : failure", task.getException());
-                        Toast.makeText(NewEmployeeActivity.this, getString(R.string.creation_employee_mail_fail),  Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
     }
 
     // Génération d'un mdp aléatoire
@@ -314,12 +316,12 @@ public class NewEmployeeActivity extends AppCompatActivity {
                                     Toast.makeText(getApplicationContext(),getString(R.string.suppression_data_success),Toast.LENGTH_LONG).show();
                                 }
                             }).setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            DIALOG_DELETE_DATA_ALREADY_RUN = false;
-                            Toast.makeText(getApplicationContext(),getString(R.string.suppression_data_cancel),Toast.LENGTH_LONG).show();
-                        }
-                    });
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    DIALOG_DELETE_DATA_ALREADY_RUN = false;
+                                    Toast.makeText(getApplicationContext(),getString(R.string.suppression_data_cancel),Toast.LENGTH_LONG).show();
+                                }
+                            });
                     AlertDialog alerts = alert.create();
                     try {       // try/catch ajouter sinon crash quand on quitte l'activité
                         alerts.show();
