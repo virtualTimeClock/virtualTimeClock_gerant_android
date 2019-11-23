@@ -9,7 +9,7 @@ import android.view.inputmethod.InputMethodManager;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity {
 
     @VisibleForTesting
     public ProgressDialog mProgressDialog;
@@ -40,6 +40,7 @@ public class BaseActivity extends AppCompatActivity {
 
     //Jouer un son
     public void mediaPlayer(MediaPlayer m) {
+        m.setVolume(0.1f,0.1f);
         m.start();
     }
 

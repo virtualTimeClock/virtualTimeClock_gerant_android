@@ -103,7 +103,6 @@ public class NewEmployeeActivity extends BaseActivity {
         on = MediaPlayer.create(this, R.raw.sound_on);
         off = MediaPlayer.create(this, R.raw.sound_off);
         error = MediaPlayer.create(this, R.raw.error_sound);
-        off.setVolume(0.1f,0.1f);
 
 
         // Maintenir l'utilisateur connecté sans qu'il change de compte à cause de la

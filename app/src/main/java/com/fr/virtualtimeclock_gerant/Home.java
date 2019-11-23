@@ -8,6 +8,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class Home extends Application {
 
+    // Vérifie si l'utilisateur est déjà connecté pour le faire directement arriver sur l'activité principale
     @Override
     public void onCreate() {
         super.onCreate();

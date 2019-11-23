@@ -134,7 +134,7 @@ public class CompleteMissionActivity extends BaseActivity implements View.OnClic
         int i = v.getId();
         if(i == R.id.employeeMissionBtn){
             String path = noteRef.getId();
-            //System.out.println(noteRef.collection(path).document().getId());
+            Log.d(TAG, "mission id : "+noteRef.collection(path).document().getId());
             Intent startEmployeeInMissionActivity = new Intent(CompleteMissionActivity.this, EmployeesInMissionActivity.class);
             startEmployeeInMissionActivity.putExtra("DOCUMENT_PATH", path);
             startActivity(startEmployeeInMissionActivity);

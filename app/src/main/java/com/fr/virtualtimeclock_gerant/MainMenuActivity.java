@@ -21,6 +21,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -129,19 +130,19 @@ public class MainMenuActivity extends BaseActivity implements View.OnClickListen
     // Création du menu avec toutes les onglets contenant les images et lors du clic sur un onglet
     //     il affiche le layout qui lui correspond en masquant les autres
     private void initMenuBar() {
-        menu.addItem("Profile", R.drawable.ic_profile);
-        menu.addItem("Employee", R.drawable.ic_employee);
-        menu.addItem("Mission",R.drawable.ic_mission_selected,true);
-        menu.addItem("Logout", R.drawable.ic_logout);
+        menu.addItem(getString(R.string.profile_txt), R.drawable.ic_profile);
+        menu.addItem(getString(R.string.employee_txt), R.drawable.ic_employee);
+        menu.addItem(getString(R.string.mission_txt),R.drawable.ic_mission_selected,true);
+        menu.addItem(getString(R.string.logout_txt), R.drawable.ic_logout);
 
         menu.setOnHSMenuClickListener(new HorizontalScrollMenuView.OnHSMenuClickListener() {
             @Override
             public void onHSMClick(MenuItem menuItem, int position) {
                 String mainMenu = menuItem.getText();
-                if(menuItem.getText().equals("Profile")) mainMenu = "Profile";
-                else if(menuItem.getText().equals("Employee")) mainMenu = "Employee";
-                else if(menuItem.getText().equals("Mission")) mainMenu = "Mission";
-                else if(menuItem.getText().equals("Logout"))mainMenu = "Logout";
+                if(menuItem.getText().equals(getString(R.string.profile_txt))) mainMenu = "Profile";
+                else if(menuItem.getText().equals(getString(R.string.employee_txt))) mainMenu = "Employee";
+                else if(menuItem.getText().equals(getString(R.string.mission_txt))) mainMenu = "Mission";
+                else if(menuItem.getText().equals(getString(R.string.logout_txt)))mainMenu = "Logout";
                 switch(mainMenu){
                     case "Profile":
                         mediaPlayer(on);
@@ -266,6 +267,7 @@ public class MainMenuActivity extends BaseActivity implements View.OnClickListen
         if(filepathCrop != null){
             final ProgressDialog progressDialog = new ProgressDialog(this);
             progressDialog.setTitle("Uploading...");
+            progressDialog.setCancelable(false);
             progressDialog.show();
 
             StorageReference reference = storageReference.child("Photos/"+"profilePic");
@@ -286,7 +288,7 @@ public class MainMenuActivity extends BaseActivity implements View.OnClickListen
                     }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
-                            double progress = (100.0*taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                            double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
                             progressDialog.setMessage("Uploaded " + (int) progress + "%");
                         }
                     });
@@ -375,8 +377,31 @@ public class MainMenuActivity extends BaseActivity implements View.OnClickListen
             }
             //Pour des mouvements de glissements
             @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                employeeAdapter.deleteItem(viewHolder.getAdapterPosition());
+            public void onSwiped(@NonNull final RecyclerView.ViewHolder viewHolder, int direction) {
+                AlertDialog.Builder alert = new AlertDialog.Builder(MainMenuActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_DARK)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle(getString(R.string.suppression))
+                        .setMessage(getString(R.string.suppression_employee_msg))
+                        .setCancelable(false)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                               employeeAdapter.deleteItem(viewHolder.getAdapterPosition());
+                                Toast.makeText(getApplicationContext(),getString(R.string.suppression_employee_success),Toast.LENGTH_LONG).show();
+                            }
+                        }).setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                employeeAdapter.notifyItemChanged(viewHolder.getAdapterPosition());
+                                Toast.makeText(getApplicationContext(),getString(R.string.suppression_data_cancel),Toast.LENGTH_LONG).show();
+                            }
+                        });
+                AlertDialog alerts = alert.create();
+                try {       // try/catch ajouter sinon crash quand on quitte l'activité
+                    alerts.show();
+                } catch (WindowManager.BadTokenException e) {
+                    Log.d(TAG, "onSensorChanged: ", e);
+                }
             }
         }).attachToRecyclerView(recyclerView_employee);
     }
@@ -410,8 +435,31 @@ public class MainMenuActivity extends BaseActivity implements View.OnClickListen
             }
             //Pour des mouvements de glissements
             @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                missionsAdapter.deleteItem(viewHolder.getAdapterPosition());
+            public void onSwiped(@NonNull final RecyclerView.ViewHolder viewHolder, int direction) {
+                AlertDialog.Builder alert = new AlertDialog.Builder(MainMenuActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_DARK)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle(getString(R.string.suppression))
+                        .setMessage(getString(R.string.suppression_mission_msg))
+                        .setCancelable(false)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                missionsAdapter.deleteItem(viewHolder.getAdapterPosition());
+                                Toast.makeText(getApplicationContext(),getString(R.string.suppression_mission_success),Toast.LENGTH_LONG).show();
+                            }
+                        }).setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                missionsAdapter.notifyItemChanged(viewHolder.getAdapterPosition());
+                                Toast.makeText(getApplicationContext(),getString(R.string.suppression_data_cancel),Toast.LENGTH_LONG).show();
+                            }
+                        });
+                AlertDialog alerts = alert.create();
+                try {       // try/catch ajouter sinon crash quand on quitte l'activité
+                    alerts.show();
+                } catch (WindowManager.BadTokenException e) {
+                    Log.d(TAG, "onSensorChanged: ", e);
+                }
             }
         }).attachToRecyclerView(recyclerView);
 

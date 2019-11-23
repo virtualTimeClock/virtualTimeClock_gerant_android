@@ -50,12 +50,6 @@ public class EmployeesInMissionAdapter extends RecyclerView.Adapter<EmployeesInM
         if(userArrayList.get(position).getDate() != null) {
             holder.mDate_EiM.setText(new SimpleDateFormat("EEE, dd-MM-yy  HH:mm aaa", Locale.getDefault()).format(userArrayList.get(position).getDate()));
         }
-//        holder.mDeleteRowBtn_EiM.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                deleteSelectedRow(position);
-//            }
-//        });
         if(userArrayList.get(position).getEstPresent() != null) {
             if (userArrayList.get(position).getEstPresent()) {
                 holder.mDeleteRowBtn_EiM.setBackgroundResource(R.drawable.ic_in_zone);

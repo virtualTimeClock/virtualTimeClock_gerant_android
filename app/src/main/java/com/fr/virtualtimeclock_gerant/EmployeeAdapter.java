@@ -7,7 +7,6 @@ import android.widget.TextView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -16,8 +15,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class EmployeeAdapter extends FirestoreRecyclerAdapter<Employee, EmployeeAdapter.NoteHolder> {
-
-    private OnItemClickListener listener;
 
     public EmployeeAdapter(@NonNull FirestoreRecyclerOptions<Employee> options) {
         super(options);
@@ -54,24 +51,6 @@ public class EmployeeAdapter extends FirestoreRecyclerAdapter<Employee, Employee
             textViewNom = itemView.findViewById(R.id.text_view_name);
             textViewPrenom = itemView.findViewById(R.id.text_view_firstname);
             textViewDateNaissance = itemView.findViewById(R.id.text_view_birthday);
-
-
-            //Clique sur l'employé pour acceder à ses données
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int position = getAdapterPosition();
-                    if(position != RecyclerView.NO_POSITION && listener != null){
-                        listener.onItemClick(getSnapshots().getSnapshot(position), position);
-                    }
-                }
-            });
         }
-    }
-    public interface OnItemClickListener {
-        void onItemClick(DocumentSnapshot documentSnapshot, int position);
-    }
-    public void setOnClickListener(OnItemClickListener listener){
-        this.listener = listener;
     }
 }

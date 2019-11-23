@@ -28,7 +28,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -207,7 +206,7 @@ public class NewMissionActivity extends BaseActivity implements LocationListener
         });
     }
 
-    // Boitede dialogue qui propose l'activation du GPS en allant dans les Paramètres
+    // Boite de dialogue qui propose l'activation du GPS en allant dans les Paramètres
     private void showGPSDisabledAlertToUser() {
         mediaPlayer(error);
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this, AlertDialog.THEME_DEVICE_DEFAULT_DARK);
@@ -393,6 +392,7 @@ public class NewMissionActivity extends BaseActivity implements LocationListener
     public void onStatusChanged(String provider, int status, Bundle extras) { /*Pas utilisé*/ }
     @Override
     public void onProviderEnabled(String provider) { /*Pas utilisé */ }
+
     //Détection quand la localisation est désactivé affiche la boite de dialogue pour la réactiver
     @Override
     public void onProviderDisabled(String provider) {

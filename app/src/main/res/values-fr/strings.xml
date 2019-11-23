@@ -67,4 +67,12 @@
     <string name="showEmployeeInMission">Employé sur cette mission</string>
     <string name="creation_employee_email_fail">Le format de l\'email est incorrect</string>
     <string name="user_deleted">Utilisateur supprimé</string>
+    <string name="suppression_mission_msg">Êtes-vous sûr de vouloir supprimer cette mission ?</string>
+    <string name="suppression_employee_msg">Êtes-vous sûr de vouloir supprimer cet employé ?</string>
+    <string name="suppression_employee_success">Employé supprimé</string>
+    <string name="suppression_mission_success">Mission supprimé</string>
+    <string name="employee_txt">Employé</string>
+    <string name="logout_txt">Déconnexion</string>
+    <string name="mission_txt">Mission</string>
+    <string name="profile_txt">Profil</string>
 </resources>

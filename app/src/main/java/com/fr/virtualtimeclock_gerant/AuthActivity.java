@@ -1,16 +1,12 @@
 package com.fr.virtualtimeclock_gerant;
 
 import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -60,7 +56,7 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
     private void signIn(String email, String password) {
         Log.d(TAG, "sign In: " + email);
 
-        //Lance la boite de chargement
+        //Lance une boite de chargement de temps de la tentative de connexion
         showProgressDialog();
 
         // Début de la connexion via email et mdp

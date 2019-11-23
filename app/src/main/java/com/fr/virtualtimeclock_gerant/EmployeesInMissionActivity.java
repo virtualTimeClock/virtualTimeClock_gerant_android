@@ -35,12 +35,11 @@ import java.util.concurrent.CountDownLatch;
 
 public class EmployeesInMissionActivity extends BaseActivity {
 
-    private static final String TAG = "EmployeeAndMission";
+    private static final String TAG = "EmployeeInThisMission";
     FirebaseFirestore db;
     private CollectionReference employeeInMissionRef;
     RecyclerView mRecyclerView;
 
-    //ArrayList<EmployeeInMission> employeeInMissionArrayList;
     ArrayList<CompleteEmployeeInMission> completeEmployeeInMissionArrayList;
 
     EmployeesInMissionAdapter adapter;
@@ -74,6 +73,7 @@ public class EmployeesInMissionActivity extends BaseActivity {
 
         db = FirebaseFirestore.getInstance();
 
+        // Récupération le l'id de la mission envoyer depuis l'activité précédante
         Intent intent = getIntent();
         Bundle b = intent.getExtras();
         if(b!=null){
@@ -105,14 +105,14 @@ public class EmployeesInMissionActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 mediaPlayer(on);
-                //pointageId= null;
                 loadDataFromFirebase();
             }
         });
     }
 
+    // Chargement des employés ayant pointés dans la mission actuellement sélection
+    //      et vérification de si l'utilisateur pointé existe toujours pour ensuite le supprimé de la liste
     public void loadDataFromFirebase() {
-        final int[] tour = {0};
         employeeInMissionRef
             .get()
             .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -122,11 +122,11 @@ public class EmployeesInMissionActivity extends BaseActivity {
                         completeEmployeeInMissionArrayList.clear();     //vider la liste pour éviter des duplication lors de l'actualisation des données
                         showProgressDialog();
                         for (final QueryDocumentSnapshot document : task.getResult()) {
-                            tour[0] = tour[0] +1;
-                            System.out.println("ICI , Tour : "+(tour[0]));
+
+
                             pointageId= null;
 
-                            //-----------------------------------------------------------------------------------------------------------------
+                            // Lecture dans la collection utilisateur ------------------------------------------------------------------------------------
                             DocumentReference employeeRef = db.collection("utilisateurs").document(document.getId());
 
 
@@ -140,7 +140,7 @@ public class EmployeesInMissionActivity extends BaseActivity {
                                     DocumentSnapshot doc = task.getResult();
                                     if (doc.exists()) {
                                         Log.d(TAG, "l'employé existe");
-                                        Log.d("EMPLOYEE", doc.getId() + " => " + doc.getData());
+                                        Log.d(TAG, "Employé : "+doc.getId() + " => " + doc.getData());
 
                                         employee.setNom(doc.getString("nom"));
                                         employee.setPrenom(doc.getString("prenom"));
@@ -170,18 +170,11 @@ public class EmployeesInMissionActivity extends BaseActivity {
                                         mRecyclerView.setAdapter(adapter);
                                 }
                             });
-                            //---------------------------------------------------------------------------------------------------------------------
+                            //Données utilisateurs récupérées --------------------------------------------------------------------------
 
-//                            System.out.print("ICI , nom : "); System.out.println(document.getString("nom"));
-//                            System.out.print("ICI , prenom : "); System.out.println(document.getString("prenom"));
-//                            System.out.print("ICI , emp nom : "); System.out.println(employee.getNom());
-//                            System.out.print("ICI , emp prenom : ");  System.out.println(employee.getPrenom());
-
-                            Log.d("TAG", document.getId() + " => " + document.getData());
-
-
+                            Log.d(TAG , "Pointage Employé : "+document.getId() + " => " + document.getData());
                             completeEmployeeInMissionArrayList.add(ceim);
-                            System.out.print("ICI , completeEmployeeInMissionActivity : "); System.out.println(completeEmployeeInMissionArrayList);
+                            Log.d(TAG, "completeEmployeeInMissionActivity : " + completeEmployeeInMissionArrayList);
 
                         }
                     } else {
