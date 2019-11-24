@@ -40,8 +40,10 @@ public class EmployeesInMissionAdapter extends RecyclerView.Adapter<EmployeesInM
         return new MyRecyclerViewHolder(view);
     }
 
-
-
+    // Fonction qui récupérer les données de la liste d'utilisateur pointé pour les mettre dans un item
+    //   -  si l'employée est bien présent dans la zone alors on met un marqueur vert sinon un marqueur rouge
+    //   -  si il y a un id en paramètre c'est que l'utilisateur n'existe plus car il a été supprimé donc ont lance la fonction deleteSelectedRow()
+    //        pour supprimé ses données de pointage de la liste
     @Override
     public void onBindViewHolder(@NonNull MyRecyclerViewHolder holder, final int position) {
         holder.mNom_EiM.setText(userArrayList.get(position).getNom());
@@ -64,6 +66,7 @@ public class EmployeesInMissionAdapter extends RecyclerView.Adapter<EmployeesInM
         }
     }
 
+    // Fonction pour supprimer une données de pointage de la base de données puis on réactualise l'affichage des données de pointage
     private void deleteSelectedRow(String position) {
         employeesInMissionActivity.showProgressDialog();
         employeesInMissionActivity.db.collection("pointage").document(missionRef).collection("pointageMission")

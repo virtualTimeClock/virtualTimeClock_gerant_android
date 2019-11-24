@@ -75,4 +75,6 @@
     <string name="logout_txt">Déconnexion</string>
     <string name="mission_txt">Mission</string>
     <string name="profile_txt">Profil</string>
+    <string name="crop_menu">Rogner l\'image</string>
+    <string name="update">Actualiser</string>
 </resources>

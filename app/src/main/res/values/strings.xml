@@ -76,4 +76,6 @@
     <string name="employee_txt">Employee</string>
     <string name="mission_txt">Mission</string>
     <string name="logout_txt">Logout</string>
+    <string name="crop_menu">Crop Image</string>
+    <string name="update">Update</string>
 </resources>

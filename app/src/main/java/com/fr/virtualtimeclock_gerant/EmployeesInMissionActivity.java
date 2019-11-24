@@ -123,61 +123,62 @@ public class EmployeesInMissionActivity extends BaseActivity {
                         showProgressDialog();
                         for (final QueryDocumentSnapshot document : task.getResult()) {
 
+                                pointageId = null;
 
-                            pointageId= null;
-
-                            // Lecture dans la collection utilisateur ------------------------------------------------------------------------------------
-                            DocumentReference employeeRef = db.collection("utilisateurs").document(document.getId());
+                                // Lecture dans la collection utilisateur ------------------------------------------------------------------------------------
+                                DocumentReference employeeRef = db.collection("utilisateurs").document(document.getId());
 
 
-                            final Employee employee = new Employee();
-                            CompleteEmployeeInMission ceim = new CompleteEmployeeInMission();
-                            final CompleteEmployeeInMission finalCeim = ceim;
+                                final Employee employee = new Employee();
+                                CompleteEmployeeInMission ceim = new CompleteEmployeeInMission();
+                                final CompleteEmployeeInMission finalCeim = ceim;
 
-                            employeeRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                    DocumentSnapshot doc = task.getResult();
-                                    if (doc.exists()) {
-                                        Log.d(TAG, "l'employé existe");
-                                        Log.d(TAG, "Employé : "+doc.getId() + " => " + doc.getData());
+                                employeeRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        DocumentSnapshot doc = task.getResult();
+                                        if (doc.exists()) {
+                                            Log.d(TAG, "l'employé existe");
+                                            Log.d(TAG, "Employé : " + doc.getId() + " => " + doc.getData());
 
-                                        employee.setNom(doc.getString("nom"));
-                                        employee.setPrenom(doc.getString("prenom"));
-                                        finalCeim.setNom(employee.getNom());
-                                        finalCeim.setPrenom(employee.getPrenom());
-                                        finalCeim.setDate(document.getDate("date"));
-                                        finalCeim.setEstPresent(document.getBoolean("estPresent"));
-                                    } else {
-                                        Log.d(TAG, "l'employé n'exite plus");
-                                        Log.d("EMPLOYEE", doc.getId() + " => " + doc.getData());
+                                            employee.setNom(doc.getString("nom"));
+                                            employee.setPrenom(doc.getString("prenom"));
+                                            finalCeim.setNom(employee.getNom());
+                                            finalCeim.setPrenom(employee.getPrenom());
+                                            finalCeim.setDate(document.getDate("date"));
+                                            finalCeim.setEstPresent(document.getBoolean("estPresent"));
+                                        } else {
+                                            Log.d(TAG, "l'employé n'exite plus");
+                                            Log.d("EMPLOYEE", doc.getId() + " => " + doc.getData());
 
-                                        pointageId = doc.getId();
+                                            pointageId = doc.getId();
 
-                                        finalCeim.setNom(getString(R.string.user_deleted));
-                                        finalCeim.setDate(new Date());
-                                        finalCeim.setEstPresent(false);
+                                            finalCeim.setNom(getString(R.string.user_deleted));
+                                            finalCeim.setDate(new Date());
+                                            finalCeim.setEstPresent(false);
+                                        }
                                     }
-                                }
-                            }).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                @Override
-                                public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                    hideProgressDialog();
-                                    Log.d(TAG, "Employee Add in mission : success");
-                                    Log.d(TAG, "missionRef avant envoi : "+missionRef);
-                                    Log.d(TAG, "pointageId avant envoi : "+pointageId);
-                                        adapter = new EmployeesInMissionAdapter(EmployeesInMissionActivity.this, completeEmployeeInMissionArrayList, missionRef, pointageId );
+                                }).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                        hideProgressDialog();
+                                        Log.d(TAG, "Employee Add in mission : success");
+                                        Log.d(TAG, "missionRef avant envoi : " + missionRef);
+                                        Log.d(TAG, "pointageId avant envoi : " + pointageId);
+                                        adapter = new EmployeesInMissionAdapter(EmployeesInMissionActivity.this, completeEmployeeInMissionArrayList, missionRef, pointageId);
                                         mRecyclerView.setAdapter(adapter);
-                                }
-                            });
-                            //Données utilisateurs récupérées --------------------------------------------------------------------------
+                                    }
+                                });
+                                //Données utilisateurs récupérées --------------------------------------------------------------------------
 
-                            Log.d(TAG , "Pointage Employé : "+document.getId() + " => " + document.getData());
-                            completeEmployeeInMissionArrayList.add(ceim);
-                            Log.d(TAG, "completeEmployeeInMissionActivity : " + completeEmployeeInMissionArrayList);
+                                Log.d(TAG, "Pointage Employé : " + document.getId() + " => " + document.getData());
+                                completeEmployeeInMissionArrayList.add(ceim);
+                                Log.d(TAG, "completeEmployeeInMissionActivity : " + completeEmployeeInMissionArrayList);
+
 
                         }
                     } else {
+
                         Log.d("TAG", "Error getting employee in missions documents: ", task.getException());
                     }
                 }

@@ -14,9 +14,12 @@
         android:background="@drawable/roundedbutton"
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:layout_marginTop="10dp"
         android:textColor="@color/colorWhite"
-        android:text="UPDATE"/>
+        android:drawableStart="@drawable/ic_refresh"
+        android:text="@string/update"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/mRecyclerView_EiM"

@@ -67,7 +67,7 @@
                 android:paddingRight="10dp"
                 android:background="@drawable/roundedbutton"
                 android:textColor="@android:color/white"
-                android:drawableLeft="@drawable/ic_photo"
+                android:drawableStart="@drawable/ic_photo"
                 android:text="@string/upload"/>
 
         </LinearLayout>

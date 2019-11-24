@@ -12,6 +12,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -31,8 +32,10 @@ import com.bumptech.glide.Glide;
 import com.darwindeveloper.horizontalscrollmenulibrary.custom_views.HorizontalScrollMenuView;
 import com.darwindeveloper.horizontalscrollmenulibrary.extras.MenuItem;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -40,6 +43,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -147,9 +151,9 @@ public class MainMenuActivity extends BaseActivity implements View.OnClickListen
                     case "Profile":
                         mediaPlayer(on);
                         menu.setItemSelected(0);
-                        menu.editItem(0,"Profile",R.drawable.ic_profile_selected,false,0);
-                        menu.editItem(1,"Employee",R.drawable.ic_employee,false,0);
-                        menu.editItem(2,"Mission",R.drawable.ic_mission,false,0);
+                        menu.editItem(0,getString(R.string.profile_txt),R.drawable.ic_profile_selected,false,0);
+                        menu.editItem(1,getString(R.string.employee_txt),R.drawable.ic_employee,false,0);
+                        menu.editItem(2,getString(R.string.mission_txt),R.drawable.ic_mission,false,0);
 
                         findViewById(R.id.layout_profile).setVisibility(View.VISIBLE);
                         findViewById(R.id.layout_employee).setVisibility(View.GONE);
@@ -158,9 +162,9 @@ public class MainMenuActivity extends BaseActivity implements View.OnClickListen
                     case "Employee":
                         mediaPlayer(on);
                         menu.setItemSelected(1);
-                        menu.editItem(0,"Profile",R.drawable.ic_profile,false,0);
-                        menu.editItem(1,"Employee",R.drawable.ic_employee_selected,false,0);
-                        menu.editItem(2,"Mission",R.drawable.ic_mission,false,0);
+                        menu.editItem(0,getString(R.string.profile_txt),R.drawable.ic_profile,false,0);
+                        menu.editItem(1,getString(R.string.employee_txt),R.drawable.ic_employee_selected,false,0);
+                        menu.editItem(2,getString(R.string.mission_txt),R.drawable.ic_mission,false,0);
 
                         findViewById(R.id.layout_profile).setVisibility(View.GONE);
                         findViewById(R.id.layout_employee).setVisibility(View.VISIBLE);
@@ -169,9 +173,9 @@ public class MainMenuActivity extends BaseActivity implements View.OnClickListen
                     case "Mission":
                         mediaPlayer(on);
                         menu.setItemSelected(2);
-                        menu.editItem(0,"Profile",R.drawable.ic_profile,false,0);
-                        menu.editItem(1,"Employee",R.drawable.ic_employee,false,0);
-                        menu.editItem(2,"Mission",R.drawable.ic_mission_selected,false,0);
+                        menu.editItem(0,getString(R.string.profile_txt),R.drawable.ic_profile,false,0);
+                        menu.editItem(1,getString(R.string.employee_txt),R.drawable.ic_employee,false,0);
+                        menu.editItem(2,getString(R.string.mission_txt),R.drawable.ic_mission_selected,false,0);
 
                         findViewById(R.id.layout_profile).setVisibility(View.GONE);
                         findViewById(R.id.layout_employee).setVisibility(View.GONE);
@@ -216,7 +220,7 @@ public class MainMenuActivity extends BaseActivity implements View.OnClickListen
     // Récupère la photo de profile sur la base de données
     // - uri : url de téléchargement de la photo sur la base de données
     private void loadProfilePicture(){
-        StorageReference profilePic = storageReference.child("Photos/profilePic").getParent().child("profilePic");
+        StorageReference profilePic = storageReference.child("Photos/profilePic.jpeg").getParent().child("profilePic.jpeg");
         profilePic.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
@@ -255,7 +259,7 @@ public class MainMenuActivity extends BaseActivity implements View.OnClickListen
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = null;
         try {
-            image = File.createTempFile(imageFileName, ".jpg", storageDir);
+            image = File.createTempFile(imageFileName, ".jpeg", storageDir);
         } catch (IOException e) {
             Log.d(TAG,"ImageFile : "+e.toString());
         }
@@ -270,7 +274,8 @@ public class MainMenuActivity extends BaseActivity implements View.OnClickListen
             progressDialog.setCancelable(false);
             progressDialog.show();
 
-            StorageReference reference = storageReference.child("Photos/"+"profilePic");
+            StorageReference reference = storageReference.child("Photos/"+"profilePic.jpeg");
+
             reference.putFile(filepathCrop)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
@@ -280,18 +285,18 @@ public class MainMenuActivity extends BaseActivity implements View.OnClickListen
                             loadProfilePicture();
                         }
                     }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            progressDialog.dismiss();
-                            Toast.makeText(MainMenuActivity.this, "Upload Failed!", Toast.LENGTH_SHORT).show();
-                        }
-                    }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
-                            double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-                            progressDialog.setMessage("Uploaded " + (int) progress + "%");
-                        }
-                    });
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    progressDialog.dismiss();
+                    Toast.makeText(MainMenuActivity.this, "Upload Failed!", Toast.LENGTH_SHORT).show();
+                }
+            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+                    double progress = (100.0*taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                    progressDialog.setMessage("Uploaded " + (int) progress + "%");
+                }
+            });
         }
     }
 
@@ -334,7 +339,7 @@ public class MainMenuActivity extends BaseActivity implements View.OnClickListen
 
         //CompressType
         //options.setCompressionFormat(Bitmap.CompressFormat.PNG);
-        //options.setCompressionFormat(Bitmap.CompressFormat.JPEG);
+        options.setCompressionFormat(Bitmap.CompressFormat.JPEG);
 
         //UI
         options.setHideBottomControls(false);
@@ -344,7 +349,7 @@ public class MainMenuActivity extends BaseActivity implements View.OnClickListen
         options.setStatusBarColor(getResources().getColor(R.color.colorOrangeButton));
         options.setToolbarColor(getResources().getColor(R.color.colorOrangeButton));
 
-        options.setToolbarTitle("Crop Image");
+        options.setToolbarTitle(getString(R.string.crop_menu));
 
         return options;
     }
